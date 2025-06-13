@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% block title %}Modifier la tâche - {{ task.title }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Missing CSS for Edit Task Form - Add to style.css */
+
+/* Container and Layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1rem;
+}
+
+.col-md-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+    padding: 0 1rem;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 1rem;
+}
+
+/* Card Components */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid rgba(0, 255, 213, 0.2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-cyan);
+}
+
+.card-header {
+    background: rgba(0, 255, 213, 0.1);
+    border-bottom: 1px solid rgba(0, 255, 213, 0.2);
+    padding: 1.5rem 2rem;
+    position: relative;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-cyan), var(--primary-pink));
+}
+
+.card-header h3, .card-header h5 {
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: transparent;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    padding: 0 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-cyan);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-pink);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-secondary);
+}
+
+/* Form Styling Enhancements */
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(0, 255, 213, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 20px rgba(0, 255, 213, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+/* Date Input Specific Styling */
+input[type="date"].form-control {
+    color-scheme: dark;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+/* Error Messages */
+.text-danger {
+    color: var(--danger);
+    margin-top: 0.5rem;
+}
+
+.text-danger small {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.25rem 0;
+}
+
+/* Button Styling */
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 1rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-cyan), var(--primary-pink));
+    color: var(--dark-bg);
+    box-shadow: 0 10px 30px rgba(0, 255, 213, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 15px 40px rgba(0, 255, 213, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-secondary {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-cyan);
+    color: var(--primary-cyan);
+}
+
+/* Badge Styling */
+.badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, var(--text-secondary), rgba(184, 197, 214, 0.8)) !important;
+    color: var(--dark-bg) !important;
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, var(--warning), rgba(245, 158, 11, 0.8)) !important;
+    color: var(--dark-bg) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, var(--success), rgba(16, 185, 129, 0.8)) !important;
+    color: var(--dark-bg) !important;
+}
+
+/* Information Panel Styling */
+.card-body p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.card-body p strong {
+    color: var(--primary-cyan);
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+/* Utility Classes */
+.mt-4 {
+    margin-top: 2rem !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .col-md-8, .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .card-header, .card-body {
+        padding: 1.5rem;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .breadcrumb {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        display: none;
+    }
+    
+    .card-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 0.875rem 1rem;
+    }
+    
+    .btn {
+        padding: 0.875rem 1.5rem;
+        min-width: auto;
+    }
+}
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Modifier la tâche</h3>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_list') }}">Projets</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_detail', project_id=project.id) }}">{{ project.name }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">Modifier {{ task.title }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="4", placeholder="Description détaillée de la tâche...") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.due_date.label(class="form-label") }}
+                            {{ form.due_date(class="form-control") }}
+                            {% if form.due_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.due_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                            </button>
+                            <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Informations de la tâche</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Projet:</strong> {{ project.name }}</p>
+                    <p><strong>Statut actuel:</strong> 
+                        {% if task.status.value == 'todo' %}
+                            <span class="badge bg-secondary">À faire</span>
+                        {% elif task.status.value == 'in_progress' %}
+                            <span class="badge bg-warning">En cours</span>
+                        {% else %}
+                            <span class="badge bg-success">Terminée</span>
+                        {% endif %}
+                    </p>
+                    {% if task.assignee %}
+                        <p><strong>Assignée à:</strong> {{ task.assignee.full_name }}</p>
+                    {% else %}
+                        <p><strong>Assignée à:</strong> Non assignée</p>
+                    {% endif %}
+                    <p><strong>Créée le:</strong> {{ task.created_at.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    {% if task.updated_at != task.created_at %}
+                        <p><strong>Modifiée le:</strong> {{ task.updated_at.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Détails-Projet</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script>
+    window.projectId = {{ project.id }};
+</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-navbar {
+            background: rgba(52, 73, 94, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .admin-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color, #3498db);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            color: var(--accent-color, #3498db);
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .stat-change.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #e74c3c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .activities-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-name {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* Additional styles for the project specific elements */
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .btn-outline-primary:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .task-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-à-faire {
+            background: #f39c12;
+        }
+
+        .status-en-cours {
+            background: #3498db;
+        }
+
+        .status-terminé {
+            background: #27ae60;
+        }
+
+        .task-info {
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-project {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .bg-warning {
+            background: #f39c12 !important;
+        }
+
+        .bg-info {
+            background: #3498db !important;
+        }
+
+        .bg-success {
+            background: #27ae60 !important;
+        }
+
+        .text-dark {
+            color: #2c3e50 !important;
+        }
+
+        .text-white {
+            color: white !important;
+        }
+
+        .text-secondary {
+            color: #7f8c8d !important;
+        }
+
+        .text-muted {
+            color: #95a5a6 !important;
+        }
+
+        .text-warning {
+            color: #f39c12 !important;
+        }
+
+        .text-info {
+            color: #3498db !important;
+        }
+
+        .text-success {
+            color: #27ae60 !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Comment Section Styles */
+        .comment-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .comment-form {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .comment-item:hover {
+            background: #e9ecef;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .comment-author-info h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .comment-content {
+            color: #2c3e50;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .edit-form {
+            margin-top: 1rem;
+        }
+
+        .edit-form textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .edit-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .justify-content-end {
+            justify-content: flex-end;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .d-inline-block {
+            display: inline-block;
+        }
+
+        .small {
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section, .activities-section {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .admin-navbar {
+                padding: 1rem;
+            }
+
+            .admin-nav {
+                gap: 1rem;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .justify-content-between {
+                justify-content: flex-start;
+            }
+
+            .comment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .comment-actions {
+                align-self: flex-end;
+            }
+        }
+        .avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.comment-item {
+    background-color: #f8f9fa;
+    transition: all 0.2s;
+}
+
+.comment-item:hover {
+    background-color: #e9ecef;
+}
+.comment-section .card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+.comment-section .card-header {
+  background: transparent;
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+}
+.comment-section .card-body {
+  padding: 1.5rem;
+}
+.comment-section .form-group {
+  margin-bottom: 1rem;
+}
+.comment-section .dropdown-menu {
+  min-width: auto;
+  padding: 0.5rem;
+}
+.comment-section .dropdown-item {
+  font-size: 0.9rem;
+}
+.status-btn {
+    border: none;
+    font-weight: 500;
+}
+
+.status-btn.status-todo {
+    background-color: #6c757d;
+    color: white;
+}
+
+.status-btn.status-in_progress {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-btn.status-completed {
+    background-color: #198754;
+    color: white;
+}
+
+.status-btn:hover {
+    opacity: 0.8;
+}
+
+.task-checkbox {
+    transform: scale(1.2);
+}
+
+.bulk-mode .task-checkbox,
+.bulk-mode #select-all {
+    display: block !important;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+    </style>
+</head>
+</body>
+  <nav class="admin-navbar">
+            <div class="admin-logo">
+                <i class="fas fa-crown"></i> Administration
+            </div>
+            <div class="admin-nav">
+                <a href="{{ url_for('admin.admin_dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+                </a>
+                <a href="{{ url_for('admin.manage_users') }}">
+                    <i class="fas fa-users"></i> Utilisateurs
+                </a>
+                <a href="{{ url_for('admin.manage_projects') }}" class="active">
+                    <i class="fas fa-project-diagram"></i> Projets
+                </a>
+                <a href="{{ url_for('admin.admin_dashboard') }}">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+                <a href="{{ url_for('auth.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </a>
+            </div>
+        </nav>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Modifier la tâche</h3>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_list') }}">Projets</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_detail', project_id=project.id) }}">{{ project.name }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">Modifier {{ task.title }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="4", placeholder="Description détaillée de la tâche...") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.due_date.label(class="form-label") }}
+                            {{ form.due_date(class="form-control") }}
+                            {% if form.due_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.due_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                            </button>
+                            <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Informations de la tâche</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Projet:</strong> {{ project.name }}</p>
+                    <p><strong>Statut actuel:</strong> 
+                        {% if task.status.value == 'todo' %}
+                            <span class="badge bg-secondary">À faire</span>
+                        {% elif task.status.value == 'in_progress' %}
+                            <span class="badge bg-warning">En cours</span>
+                        {% else %}
+                            <span class="badge bg-success">Terminée</span>
+                        {% endif %}
+                    </p>
+                    {% if task.assignee %}
+                        <p><strong>Assignée à:</strong> {{ task.assignee.full_name }}</p>
+                    {% else %}
+                        <p><strong>Assignée à:</strong> Non assignée</p>
+                    {% endif %}
+                    <p><strong>Créée le:</strong> {{ task.created_at.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    {% if task.updated_at != task.created_at %}
+                        <p><strong>Modifiée le:</strong> {{ task.updated_at.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+</style>
+
+</body>
+</html>

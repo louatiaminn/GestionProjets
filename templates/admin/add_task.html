@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une tâche</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+       .admin-navbar {
+    background: rgba(52, 73, 94, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.admin-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* Mobile hamburger menu button */
+.admin-hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    gap: 0.25rem;
+}
+
+.admin-hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #ecf0f1;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.admin-hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.admin-hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.admin-hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .admin-navbar {
+        padding: 1rem 1.5rem;
+    }
+    
+    .admin-nav {
+        gap: 1.5rem;
+    }
+    
+    .admin-logo {
+        font-size: 1.3rem;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .admin-navbar {
+        padding: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .admin-logo {
+        font-size: 1.2rem;
+        flex: 1;
+    }
+    
+    .admin-hamburger {
+        display: flex;
+        order: 2;
+    }
+    
+    .admin-nav {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: rgba(52, 73, 94, 0.98);
+        backdrop-filter: blur(15px);
+        padding: 1rem 0;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        gap: 0;
+        order: 3;
+    }
+    
+    .admin-nav.active {
+        display: flex;
+    }
+    
+    .admin-nav a {
+        padding: 1rem 2rem;
+        border-radius: 0;
+        width: 100%;
+        justify-content: flex-start;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .admin-nav a:last-child {
+        border-bottom: none;
+    }
+    
+    .admin-nav a:hover, .admin-nav a.active {
+        background: rgba(231, 76, 60, 0.1);
+        padding-left: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-navbar {
+        padding: 0.75rem;
+    }
+    
+    .admin-logo {
+        font-size: 1.1rem;
+        gap: 0.3rem;
+    }
+    
+    .admin-logo span:not(:first-child) {
+        display: none;
+    }
+    
+    .admin-nav a {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .admin-nav a span.nav-text {
+        display: inline;
+    }
+    
+    .admin-nav a:hover, .admin-nav a.active {
+        padding-left: 2rem;
+    }
+}
+
+/* Ultra-small screens */
+@media (max-width: 320px) {
+    .admin-navbar {
+        padding: 0.5rem;
+    }
+    
+    .admin-logo {
+        font-size: 1rem;
+    }
+    
+    .admin-nav a {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .page-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        .project-name {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-label i {
+            color: #3498db;
+            font-size: 1rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+        .form-control:hover {
+            border-color: #bdc3c7;
+            background: white;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+        input[type="date"].form-control {
+            cursor: pointer;
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f618d);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #7f8c8d;
+            border: 2px solid #bdc3c7;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            color: white;
+            border-color: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        .form-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+        .form-group:focus-within .form-icon {
+            color: #3498db;
+        }
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .floating-element {
+            position: absolute;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        .floating-element:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        .floating-element:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        .success-message {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #27ae60;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .admin-navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .admin-nav {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="admin-logo">
+            <i class="fas fa-crown"></i> Administration
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}" >
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{{ url_for('admin.manage_projects') }}" class="active">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </nav>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <i class="fas fa-plus-circle"></i>
+                Ajouter une tâche
+            </div>
+            <div class="page-subtitle">
+                Projet : <span class="project-name">{{ project.name }}</span>
+            </div>
+        </div>
+        <div class="form-container">
+            <div class="floating-elements">
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+            </div>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.title.label(class="form-label") }}
+                    <i class="fas fa-heading" style="margin-right: 0.5rem;"></i>
+                    {{ form.title(class="form-control", placeholder="Entrez le titre de la tâche...") }}
+                    <i class="fas fa-edit form-icon"></i>
+                </div>
+                <div class="form-group">
+                    {{ form.description.label(class="form-label") }}
+                    <i class="fas fa-align-left" style="margin-right: 0.5rem;"></i>
+                    {{ form.description(class="form-control", rows="4", placeholder="Décrivez la tâche en détail...") }}
+                    <i class="fas fa-file-alt form-icon"></i>
+                </div>  
+                <div class="form-group">
+                    {{ form.due_date.label(class="form-label") }}
+                    <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
+                    {{ form.due_date(class="form-control") }}
+                    <i class="fas fa-clock form-icon"></i>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        {{ form.submit.label.text }}
+                    </button>
+                    <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formInputs = document.querySelectorAll('.form-control');
+            
+            formInputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const titleInput = document.querySelector('input[name="title"]');
+                if (!titleInput.value.trim()) {
+                    e.preventDefault();
+                    titleInput.style.borderColor = '#e74c3c';
+                    titleInput.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

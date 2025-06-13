@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Gestion des Utilisateurs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-navbar {
+            background: rgba(52, 73, 94, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .admin-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .users-table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        .users-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .users-table tbody tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+            transform: scale(1.01);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-username {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .role-admin {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+
+        .role-member {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .role-project-manager {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 8px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .pagination .current {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-stat {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .quick-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color, #3498db);
+        }
+
+        .quick-stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border-left: 4px solid #27ae60;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .users-table {
+                font-size: 0.9rem;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 0.5rem;
+            }
+
+            .actions-cell {
+                flex-direction: column;
+            }
+
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #e74c3c;
+            font-size: 1.2em;
+        }
+
+        .modal-header i {
+            margin-right: 8px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .warning-text {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            color: #856404;
+            font-size: 0.9em;
+        }
+
+        .warning-text i {
+            margin-right: 8px;
+            color: #f39c12;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        tr.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        tr {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+   </style>
+</head>
+<body>
+     <nav class="admin-navbar">
+        <div class="admin-logo">
+            <i class="fas fa-crown"></i> Administration
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}" class="active">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{{ url_for('admin.manage_projects') }}">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-users"></i>
+                Gestion des Utilisateurs
+            </h1>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <div class="quick-stat-number" style="--color: #3498db;">{{ users.total }}</div>
+                <div class="quick-stat-label">Total Utilisateurs</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" style="--color: #27ae60;">
+                    {{ users.items | selectattr('is_active') | list | length }}
+                </div>
+                <div class="quick-stat-label">Utilisateurs Actifs</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" style="--color: #9b59b6;">
+                    {{ users.items | selectattr('role.value', 'equalto', 'admin') | list | length }}
+                </div>
+                <div class="quick-stat-label">Administrateurs</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" style="--color: #e74c3c;">
+                    {{ users.items | rejectattr('is_active') | list | length }}
+                </div>
+                <div class="quick-stat-label">Utilisateurs Inactifs</div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" class="search-input" 
+                       placeholder="Rechercher par nom, email, nom d'utilisateur..." 
+                       value="{{ search }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+                {% if search %}
+                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Effacer
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="users-table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="fas fa-list"></i>
+                    Liste des Utilisateurs
+                    {% if search %}
+                        <span style="font-weight: normal; opacity: 0.8;">
+                            - Résultats pour "{{ search }}"
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="table-actions">
+                    <span>{{ users.total }} utilisateur(s) trouvé(s)</span>
+                    <button class="btn btn-success" onclick="exportToCSV()" title="Exporter la liste en CSV">
+                        <i class="fas fa-file-csv"></i> Exporter CSV
+                    </button>
+                </div>
+            </div>
+
+            {% if users.items %}
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Date d'inscription</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                        <tr data-user-id="{{ user.id }}">
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">{{ user.full_name }}</div>
+                                        <div class="user-username">@{{ user.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="role-badge role-{{ user.role.value }}">
+                                    {% if user.role.value == 'admin' %}
+                                        <i class="fas fa-crown"></i> Administrateur
+                                    {% elif user.role.value == 'project_manager' %}
+                                        <i class="fas fa-user-tie"></i> Chef de Projet
+                                    {% else %}
+                                        <i class="fas fa-user"></i> Membre
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ 'active' if user.is_active else 'inactive' }}">
+                                    <i class="fas fa-{{ 'check-circle' if user.is_active else 'times-circle' }}"></i>
+                                    {{ 'Actif' if user.is_active else 'Inactif' }}
+                                </span>
+                            </td>
+                            <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <div class="actions-cell">
+                                    {% if user.id != current_user.id %}
+                                        <button class="btn btn-sm {{ 'btn-warning' if user.is_active else 'btn-success' }}"
+                                                onclick="toggleUserStatus({{ user.id }}, '{{ user.username }}')"
+                                                title="{{ 'Désactiver' if user.is_active else 'Activer' }} l'utilisateur">
+                                            <i class="fas fa-{{ 'pause' if user.is_active else 'play' }}"></i>
+                                        </button>
+                                    {% endif %}
+
+                                    {% if user.id != current_user.id %}
+                                        <button class="btn btn-sm {{ 'btn-danger' if user.role.value == 'admin' else 'btn-primary' }}"
+                                                onclick="toggleAdminRole({{ user.id }}, '{{ user.username }}')"
+                                                title="{{ 'Retirer' if user.role.value == 'admin' else 'Donner' }} les droits admin">
+                                            <i class="fas fa-{{ 'user-minus' if user.role.value == 'admin' else 'user-plus' }}"></i>
+                                        </button>
+                                    {% endif %}
+
+                                    {% if user.id != current_user.id %}
+                                        <button class="btn btn-sm btn-delete"
+                                                onclick="deleteUser({{ user.id }}, '{{ user.username }}')"
+                                                title="Supprimer l'utilisateur">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if users.pages > 1 %}
+                    <div class="pagination">
+                        {% if users.has_prev %}
+                            <a href="{{ url_for('admin.manage_users', page=users.prev_num, search=search) }}">
+                                <i class="fas fa-chevron-left"></i> Précédent
+                            </a>
+                        {% endif %}
+
+                        {% for page_num in users.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num != users.page %}
+                                    <a href="{{ url_for('admin.manage_users', page=page_num, search=search) }}">
+                                        {{ page_num }}
+                                    </a>
+                                {% else %}
+                                    <span class="current">{{ page_num }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span>...</span>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if users.has_next %}
+                            <a href="{{ url_for('admin.manage_users', page=users.next_num, search=search) }}">
+                                Suivant <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>Aucun utilisateur trouvé</h3>
+                    {% if search %}
+                        <p>Aucun utilisateur ne correspond à votre recherche "{{ search }}".</p>
+                        <a href="{{ url_for('admin.manage_users') }}" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Voir tous les utilisateurs
+                        </a>
+                    {% else %}
+                        <p>Il n'y a pas encore d'utilisateurs dans le système.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmer la suppression</h3>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous absolument sûr de vouloir supprimer l'utilisateur <strong id="deleteUserName"></strong> ?</p>
+                <p class="warning-text">
+                    <i class="fas fa-warning"></i>
+                    Cette action est irréversible. Tous les données associées à cet utilisateur seront définitivement perdues.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i> Supprimer définitivement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDeleteUserId = null;
+        let currentDeleteUserName = null;
+
+        async function toggleUserStatus(userId, username) {
+            if (!confirm(`Êtes-vous sûr de vouloir changer le statut de ${username} ?`)) {
+                return;
+            }
+
+            const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+            row.classList.add('loading');
+
+            try {
+                const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const statusBadge = row.querySelector('.status-badge');
+                    const statusIcon = statusBadge.querySelector('i');
+                    
+                    if (data.is_active) {
+                        statusBadge.className = 'status-badge status-active';
+                        statusIcon.className = 'fas fa-check-circle';
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Actif';
+                    } else {
+                        statusBadge.className = 'status-badge status-inactive';
+                        statusIcon.className = 'fas fa-times-circle';
+                        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> Inactif';
+                    }
+
+                    const toggleBtn = row.querySelector('button[onclick*="toggleUserStatus"]');
+                    if (data.is_active) {
+                        toggleBtn.className = 'btn btn-sm btn-warning';
+                        toggleBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        toggleBtn.title = 'Désactiver l\'utilisateur';
+                    } else {
+                        toggleBtn.className = 'btn btn-sm btn-success';
+                        toggleBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        toggleBtn.title = 'Activer l\'utilisateur';
+                    }
+
+                    showMessage('success', `Statut de ${username} mis à jour avec succès.`);
+                } else {
+                    showMessage('error', data.error || 'Erreur lors de la mise à jour du statut.');
+                }
+            } catch (error) {
+                showMessage('error', 'Erreur de connexion au serveur.');
+                console.error('Error:', error);
+            } finally {
+                row.classList.remove('loading');
+            }
+        }
+
+        async function toggleAdminRole(userId, username) {
+            if (!confirm(`Êtes-vous sûr de vouloir changer le rôle de ${username} ?`)) {
+                return;
+            }
+
+            const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+            row.classList.add('loading');
+
+            try {
+                const response = await fetch(`/admin/users/${userId}/toggle-admin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const roleBadge = row.querySelector('.role-badge');
+                    
+                    if (data.is_admin) {
+                        roleBadge.className = 'role-badge role-admin';
+                        roleBadge.innerHTML = '<i class="fas fa-crown"></i> Administrateur';
+                    } else {
+                        roleBadge.className = 'role-badge role-member';
+                        roleBadge.innerHTML = '<i class="fas fa-user"></i> Membre';
+                    }
+                    const toggleBtn = row.querySelector('button[onclick*="toggleAdminRole"]');
+                    if (data.is_admin) {
+                        toggleBtn.className = 'btn btn-sm btn-danger';
+                        toggleBtn.innerHTML = '<i class="fas fa-user-minus"></i>';
+                        toggleBtn.title = 'Retirer les droits admin';
+                    } else {
+                        toggleBtn.className = 'btn btn-sm btn-primary';
+                        toggleBtn.innerHTML = '<i class="fas fa-user-plus"></i>';
+                        toggleBtn.title = 'Donner les droits admin';
+                    }
+
+                    showMessage('success', `Rôle de ${username} mis à jour avec succès.`);
+                } else {
+                    showMessage('error', data.error || 'Erreur lors de la mise à jour du rôle.');
+                }
+            } catch (error) {
+                showMessage('error', 'Erreur de connexion au serveur.');
+                console.error('Error:', error);
+            } finally {
+                row.classList.remove('loading');
+            }
+        }
+
+        function deleteUser(userId, username) {
+            currentDeleteUserId = userId;
+            currentDeleteUserName = username;
+            
+            document.getElementById('deleteUserName').textContent = username;
+            document.getElementById('deleteModal').style.display = 'flex';
+            
+            // Set up the confirm button click handler
+            document.getElementById('confirmDeleteBtn').onclick = function() {
+                confirmDeleteUser();
+            };
+        }
+
+        async function confirmDeleteUser() {
+            if (!currentDeleteUserId) return;
+
+            const row = document.querySelector(`tr[data-user-id="${currentDeleteUserId}"]`);
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            // Show loading state
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Suppression...';
+            confirmBtn.disabled = true;
+            row.classList.add('loading');
+
+            try {
+                const response = await fetch(`/admin/users/${currentDeleteUserId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Remove the row from the table with animation
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(-20px)';
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        
+                        // Update the total count if displayed
+                        const totalElement = document.querySelector('.quick-stat-number');
+                        if (totalElement) {
+                            const currentTotal = parseInt(totalElement.textContent);
+                            totalElement.textContent = currentTotal - 1;
+                        }
+                    }, 300);
+
+                    showMessage('success', `Utilisateur ${currentDeleteUserName} supprimé avec succès.`);
+                    closeDeleteModal();
+                } else {
+                    showMessage('error', data.error || 'Erreur lors de la suppression de l\'utilisateur.');
+                    confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer définitivement';
+                    confirmBtn.disabled = false;
+                }
+            } catch (error) {
+                showMessage('error', 'Erreur de connexion au serveur.');
+                console.error('Error:', error);
+                confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer définitivement';
+                confirmBtn.disabled = false;
+            } finally {
+                row.classList.remove('loading');
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentDeleteUserId = null;
+            currentDeleteUserName = null;
+            
+            // Reset button state
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer définitivement';
+            confirmBtn.disabled = false;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('deleteModal').style.display === 'flex') {
+                closeDeleteModal();
+            }
+        });
+
+        function exportToCSV() {
+            const table = document.querySelector('.users-table');
+            if (!table) {
+                showMessage('error', 'Aucune donnée à exporter.');
+                return;
+            }
+
+            const rows = table.querySelectorAll('tbody tr');
+            if (rows.length === 0) {
+                showMessage('error', 'Aucune donnée à exporter.');
+                return;
+            }
+
+            // CSV headers
+            const headers = ['Nom complet', 'Nom d\'utilisateur', 'Email', 'Rôle', 'Statut', 'Date d\'inscription'];
+            let csvContent = headers.join(',') + '\n';
+
+            // Extract data from each row
+            rows.forEach(row => {
+                const userInfo = row.querySelector('.user-info');
+                const fullName = userInfo.querySelector('.user-name').textContent.trim();
+                const username = userInfo.querySelector('.user-username').textContent.trim().replace('@', '');
+                const email = row.cells[1].textContent.trim();
+                const roleText = row.querySelector('.role-badge').textContent.trim().replace(/^\s*\w+\s/, '');
+                const statusText = row.querySelector('.status-badge').textContent.trim().replace(/^\s*\w+\s/, '');
+                
+                const dateText = row.cells[4].textContent.trim();
+                const csvRow = [
+                    `"${fullName.replace(/"/g, '""')}"`,
+                    `"${username.replace(/"/g, '""')}"`,
+                    `"${email.replace(/"/g, '""')}"`,
+                    `"${roleText.replace(/"/g, '""')}"`,
+                    `"${statusText.replace(/"/g, '""')}"`,
+                    `"${dateText.replace(/"/g, '""')}"`
+                ].join(',');
+
+                csvContent += csvRow + '\n';
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);                
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const filename = `utilisateurs_${dateStr}.csv`;
+                
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('success', `Fichier CSV exporté avec succès : ${filename}`);
+            } else {
+                showMessage('error', 'Export CSV non supporté par ce navigateur.');
+            }
+        }
+
+        function showMessage(type, message) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass}`;
+            alert.innerHTML = `
+                <i class="fas ${iconClass}"></i>
+                ${message}
+            `;
+            
+            const container = document.querySelector('.container');
+            const header = container.querySelector('.page-header');
+            container.insertBefore(alert, header.nextSibling);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+
+</body>
+</html>

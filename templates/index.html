@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Accueil - Gestionnaire de Projets{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h2>Gérez vos Projets Comme un Pro</h2>
+        <p>Rationalisez votre flux de travail, collaborez de manière transparente et obtenez des résultats exceptionnels avec notre plateforme de gestion de projet de pointe conçue pour les équipes modernes.</p>
+        <div class="cta-buttons">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Accéder au Tableau de Bord</a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Commencer Gratuitement</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Se Connecter</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<section class="features-preview">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Gestion de Projets</h3>
+                <p>Créez et organisez vos projets avec une interface intuitive et moderne.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✅</div>
+                <h3>Suivi des Tâches</h3>
+                <p>Assignez des tâches, définissez des priorités et suivez les progrès en temps réel.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Collaboration d'Équipe</h3>
+                <p>Travaillez ensemble efficacement avec des outils de collaboration intégrés.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Rapports & Analytics</h3>
+                <p>Obtenez des insights détaillés sur la performance de vos projets.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

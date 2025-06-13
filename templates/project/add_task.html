@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter une tâche{% endblock %}
+
+
+{% block content %}
+<style>
+
+.container.mt-5 {
+    max-width: 700px;
+    margin: 3rem auto;
+}
+
+.container.mt-5 form {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 255, 213, 0.2);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.container.mt-5 h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 8px rgba(0, 255, 213, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+button[type="submit"].btn-primary {
+    margin-right: 1rem;
+}
+
+button[type="submit"].btn-primary,
+a.btn-secondary {
+    font-size: 1rem;
+    padding: 0.75rem 2rem;
+}
+
+a.btn-secondary {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+a.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .container.mt-5 {
+        padding: 0 1rem;
+        margin: 2rem auto;
+    }
+    .container.mt-5 form {
+        padding: 1.5rem;
+    }
+    .container.mt-5 h2 {
+        font-size: 1.5rem;
+    }
+    button[type="submit"].btn-primary,
+    a.btn-secondary {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.75rem;
+    }
+    button[type="submit"].btn-primary {
+        margin-right: 0;
+    }
+}
+</style>
+<div class="container mt-5">
+    <h2>Ajouter une tâche au projet : <strong>{{ project.name }}</strong></h2>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
+        </div>
+        
+        <div class="form-group mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows="3") }}
+        </div>
+        
+        <div class="form-group mb-3">
+            {{ form.due_date.label(class="form-label") }}
+            {{ form.due_date(class="form-control") }}
+        </div>
+        
+        <div>
+            <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+        </div>
+        <br>
+        <div>
+        <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

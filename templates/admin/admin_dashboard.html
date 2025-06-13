@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Tableau de Bord</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+       .admin-navbar {
+    background: rgba(52, 73, 94, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.admin-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* Mobile hamburger menu button */
+.admin-hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    gap: 0.25rem;
+}
+
+.admin-hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #ecf0f1;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.admin-hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.admin-hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.admin-hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .admin-navbar {
+        padding: 1rem 1.5rem;
+    }
+    
+    .admin-nav {
+        gap: 1.5rem;
+    }
+    
+    .admin-logo {
+        font-size: 1.3rem;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .admin-navbar {
+        padding: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .admin-logo {
+        font-size: 1.2rem;
+        flex: 1;
+    }
+    
+    .admin-hamburger {
+        display: flex;
+        order: 2;
+    }
+    
+    .admin-nav {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: rgba(52, 73, 94, 0.98);
+        backdrop-filter: blur(15px);
+        padding: 1rem 0;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        gap: 0;
+        order: 3;
+    }
+    
+    .admin-nav.active {
+        display: flex;
+    }
+    
+    .admin-nav a {
+        padding: 1rem 2rem;
+        border-radius: 0;
+        width: 100%;
+        justify-content: flex-start;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .admin-nav a:last-child {
+        border-bottom: none;
+    }
+    
+    .admin-nav a:hover, .admin-nav a.active {
+        background: rgba(231, 76, 60, 0.1);
+        padding-left: 2.5rem;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .admin-navbar {
+        padding: 0.75rem;
+    }
+    
+    .admin-logo {
+        font-size: 1.1rem;
+        gap: 0.3rem;
+    }
+    
+    .admin-logo span:not(:first-child) {
+        display: none;
+    }
+    
+    .admin-nav a {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .admin-nav a span.nav-text {
+        display: inline;
+    }
+    
+    .admin-nav a:hover, .admin-nav a.active {
+        padding-left: 2rem;
+    }
+}
+
+/* Ultra-small screens */
+@media (max-width: 320px) {
+    .admin-navbar {
+        padding: 0.5rem;
+    }
+    
+    .admin-logo {
+        font-size: 1rem;
+    }
+    
+    .admin-nav a {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color, #3498db);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            color: var(--accent-color, #3498db);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .stat-change.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .activities-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-name {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section, .activities-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .admin-navbar {
+                padding: 1rem;
+            }
+            
+            .admin-nav {
+                gap: 1rem;
+            }
+
+            .quick-actions {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Navigation -->
+    <nav class="admin-navbar">
+        <div class="admin-logo">
+            <i class="fas fa-crown"></i> Administration
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="active">
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{{ url_for('admin.manage_projects') }}">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1 class="admin-title">
+                <i class="fas fa-shield-alt"></i>
+                Tableau de Bord Administrateur
+            </h1>
+            <p class="admin-subtitle">Vue d'ensemble du système et statistiques globales</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card" style="--accent-color: #3498db;">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ total_users }}</div>
+                <div class="stat-label">Utilisateurs Total</div>
+                <div class="stat-change positive">{{ active_users }} actifs</div>
+            </div>
+            
+            <div class="stat-card" style="--accent-color: #9b59b6;">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ total_projects }}</div>
+                <div class="stat-label">Projets Total</div>
+                <div class="stat-change positive">{{ active_projects }} actifs</div>
+            </div>
+            
+            <div class="stat-card" style="--accent-color: #e67e22;">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ total_tasks }}</div>
+                <div class="stat-label">Tâches Total</div>
+                <div class="stat-change positive">{{ completed_tasks }} terminées</div>
+            </div>
+            
+            <div class="stat-card" style="--accent-color: #e74c3c;">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div class="stat-number">{{ admin_users }}</div>
+                <div class="stat-label">Administrateurs</div>
+                <div class="stat-change">{{ total_users - admin_users }} membres</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i> Évolution Mensuelle
+                </h3>
+                <div class="chart-wrapper">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i> Répartition des Tâches
+                </h3>
+                <div class="chart-wrapper">
+                    <canvas id="tasksChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="activities-section">
+            <div class="activity-card">
+                <h3 class="section-title">
+                    <i class="fas fa-user-plus"></i> Nouveaux Utilisateurs
+                </h3>
+                {% for user in recent_users %}
+                <div class="activity-item">
+                    <div class="activity-avatar">
+                        {{ user.first_name[0] }}{{ user.last_name[0] }}
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-name">{{ user.full_name }}</div>
+                        <div class="activity-meta">{{ user.created_at.strftime('%d/%m/%Y') }}</div>
+                    </div>
+                    <span class="status-badge status-{{ 'active' if user.is_active else 'inactive' }}">
+                        {{ 'Actif' if user.is_active else 'Inactif' }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="activity-card">
+                <h3 class="section-title">
+                    <i class="fas fa-folder-plus"></i> Projets Récents
+                </h3>
+                {% for project in recent_projects %}
+                <div class="activity-item">
+                    <div class="activity-avatar" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-name">{{ project.name }}</div>
+                        <div class="activity-meta">{{ project.owner.full_name }} • {{ project.created_at.strftime('%d/%m') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="activity-card">
+                <h3 class="section-title">
+                    <i class="fas fa-trophy"></i> Utilisateurs Actifs
+                </h3>
+                {% for user_data in top_users %}
+                <div class="activity-item">
+                    <div class="activity-avatar" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                        {{ user_data.full_name.split()[0][0] }}{{ user_data.full_name.split()[1][0] if user_data.full_name.split()|length > 1 else '' }}
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-name">{{ user_data.full_name }}</div>
+                        <div class="activity-meta">{{ user_data.project_count }} projets</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: [
+                    {% for stat in monthly_stats %}
+                    '{{ stat.month }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Nouveaux Utilisateurs',
+                    data: [
+                        {% for stat in monthly_stats %}
+                        {{ stat.users }}{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Nouveaux Projets',
+                    data: [
+                        {% for stat in monthly_stats %}
+                        {{ stat.projects }}{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    borderColor: '#9b59b6',
+                    backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Tasks Distribution Chart
+        const tasksCtx = document.getElementById('tasksChart').getContext('2d');
+        new Chart(tasksCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['À Faire', 'En Cours', 'Terminées'],
+                datasets: [{
+                    data: [
+                        {{ total_tasks - completed_tasks - pending_tasks + (total_tasks - completed_tasks) / 2 }},
+                        {{ (total_tasks - completed_tasks) / 2 }},
+                        {{ completed_tasks }}
+                    ],
+                    backgroundColor: [
+                        '#f39c12',
+                        '#3498db',
+                        '#27ae60'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

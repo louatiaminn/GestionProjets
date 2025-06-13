@@ -1,0 +1,153 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membres - {{ project.name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; color: #333; }
+        a { text-decoration: none; }
+
+        .admin-navbar { background: rgba(52,73,94,0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; box-shadow: 0 2px 20px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .admin-logo { font-size: 1.5rem; font-weight: bold; color: #e74c3c; display: flex; align-items: center; gap: 0.5rem; }
+        .admin-nav { display: flex; gap: 1rem; }
+        .admin-nav a { color: #ecf0f1; padding: 0.5rem 1rem; border-radius: 25px; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .admin-nav a.active, .admin-nav a:hover { background: rgba(231,76,60,0.2); color: #e74c3c; }
+
+        .container { max-width: 1400px; margin: 2rem auto; }
+
+        .admin-header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .admin-title { font-size: 2rem; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; }
+        .admin-subtitle { font-size: 1rem; color: #7f8c8d; }
+
+        .stats-card { background: rgba(255,255,255,0.95); padding: 1rem 1.5rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: inline-flex; flex-direction: column; align-items: center; }
+        .stats-card h3 { font-size: 2rem; margin-bottom: 0.25rem; color: #2c3e50; }
+        .stats-card small { color: #7f8c8d; }
+
+        .member-card { transition: transform .2s, box-shadow .2s; border-radius: 10px; overflow: hidden; }
+        .member-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .owner-badge { background: linear-gradient(45deg,#007bff,#0056b3); }
+        .admin-badge { background: linear-gradient(45deg,#dc3545,#c82333); }
+        .member-badge { background: linear-gradient(45deg,#28a745,#218838); }
+
+        .btn-primary { background: #3498db; color: #fff; border: none; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-outline-danger { border: 1px solid #e74c3c; color: #e74c3c; }
+        .btn-outline-danger:hover { background: #e74c3c; color: #fff; }
+
+        .empty-state { text-align: center; padding: 2rem; color: #7f8c8d; }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: .5; }
+
+        @media(max-width:768px) { .admin-navbar { padding:1rem; } .container { margin:1rem; } }
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="admin-logo"><i class="fas fa-crown"></i> Administration</div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('admin.manage_users') }}"><i class="fas fa-users"></i> Utilisateurs</a>
+            <a href="{{ url_for('admin.manage_projects') }}" class="active"><i class="fas fa-project-diagram"></i> Projets</a>
+            <a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent p-0 mb-3">
+                    <li class="breadcrumb-item"><a href="{{ url_for('project.project_list') }}"><i class="fas fa-folder"></i> Projets</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('project.project_detail', project_id=project.id) }}">{{ project.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Membres</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="admin-title"><i class="fas fa-users"></i> Membres du projet</h1>
+                    <p class="admin-subtitle">{{ project.name }}</p>
+                </div>
+                <div class="stats-card">
+                    <h3>{{ members|length }}</h3>
+                    <small>Membre{{ 's' if members|length>1 else '' }}</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                {% if members %}
+                <div class="row g-3">
+                    {% for member in members %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="member-card card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                        {{ member.first_name[0] }}{{ member.last_name[0] }}
+                                    </div>
+                                </div>
+                                <h5>{{ member.full_name }}</h5>
+                                <p class="text-muted small">{{ member.email }}</p>
+                                {% if member.id==project.owner_id %}<span class="badge owner-badge">Propriétaire</span>
+                                {% elif member.role.value=='admin' %}<span class="badge admin-badge">Admin</span>
+                                {% else %}<span class="badge member-badge">Membre</span>{% endif %}
+                                {% if (current_user.role.value=='admin' or project.owner_id==current_user.id) and member.id!=project.owner_id %}
+                                <form method="POST" action="{{ url_for('project.remove_member', project_id=project.id, user_id=member.id) }}" class="mt-3">
+                                    <button class="btn btn-outline-danger btn-sm">Retirer</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h5>Aucun membre</h5>
+                    <p>Ce projet n'a pas encore de membres.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                {% if current_user.role.value=='admin' or project.owner_id==current_user.id %}
+                <div class="admin-header">
+                    <h5><i class="fas fa-user-plus"></i> Ajouter un membre</h5>
+                    {% if available_users %}
+                    <form method="POST" action="{{ url_for('project.add_member', project_id=project.id) }}">
+                        <div class="mb-3">
+                            <select name="user_id" class="form-select" required>
+                                <option value="">Choisir un utilisateur...</option>
+                                {% for user in available_users %}<option value="{{ user.id}}">{{ user.full_name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100">Ajouter</button>
+                    </form>
+                    {% else %}<p class="text-muted">Tous les utilisateurs sont déjà membres.</p>{% endif %}
+                </div>
+                {% endif %}
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <p><strong>Propriétaire:</strong> {{ project.owner.full_name }}</p>
+                        <p><strong>Créé le:</strong> {{ project.created_at.strftime('%d/%m/%Y') }}</p>
+                        {% if project.deadline %}<p><strong>Échéance:</strong> {{ project.deadline.strftime('%d/%m/%Y') }}</p>{% endif %}
+                        <p><strong>Progression:</strong></p>
+                        <div class="progress" style="height:8px;"><div class="progress-bar" style="width:{{ project.progress_percentage }}%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> Retour</a>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

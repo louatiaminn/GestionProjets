@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Projets</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+    :root {
+        --bg-main: #2c3e50;
+        --bg-dark: #34495e;
+        --text-main: #2c3e50;
+        --text-sub: #7f8c8d;
+        --accent: #e74c3c;
+        --accent-light: rgba(231, 76, 60, 0.2);
+        --primary: #3498db;
+        --primary-dark: #2980b9;
+        --secondary: #9b59b6;
+        --secondary-dark: #8e44ad;
+        --warning: #e67e22;
+        --warning-dark: #d35400;
+        --success: #27ae60;
+        --success-bg: rgba(46, 204, 113, 0.1);
+        --inactive-bg: rgba(231, 76, 60, 0.1);
+        --white: #fff;
+        --light-blur-bg: rgba(255, 255, 255, 0.95);
+        --shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-dark) 100%);
+        min-height: 100vh;
+        color: var(--text-main);
+        line-height: 1.6;
+    }
+
+    .admin-navbar {
+        background: rgba(52, 73, 94, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .admin-logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .admin-nav {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .admin-nav a {
+        color: #ecf0f1;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        transition: background 0.3s, color 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .admin-nav a:hover,
+    .admin-nav a.active {
+        background: var(--accent-light);
+        color: var(--accent);
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .admin-header,
+    .bulk-actions-panel,
+    .project-card {
+        background: var(--light-blur-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .admin-title {
+        font-size: 2.5rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .admin-subtitle {
+        color: var(--text-sub);
+        font-size: 1.1rem;
+    }
+
+    .header-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-secondary { background: var(--secondary); color: var(--white); }
+    .btn-secondary:hover { background: var(--secondary-dark); }
+
+    .btn-warning { background: var(--warning); color: var(--white); }
+    .btn-warning:hover { background: var(--warning-dark); }
+
+    .bulk-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .bulk-controls select {
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .project-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .project-inactive {
+        opacity: 0.6;
+    }
+
+    .bulk-checkbox {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .project-title a {
+        text-decoration: none;
+        color: var(--text-main);
+        font-size: 1.4rem;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    .status-inactive {
+        background: var(--inactive-bg);
+        color: var(--accent);
+    }
+
+    .project-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text-sub);
+        font-size: 0.9rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .project-description {
+        font-size: 0.95rem;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+    }
+
+    .progress-section {
+        margin-bottom: 1rem;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+        color: var(--text-sub);
+    }
+
+    .progress-bar {
+        background: #e0e0e0;
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        background: var(--primary);
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    .task-stats {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--text-main);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-sub);
+    }
+
+    .project-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-sm-primary { background: var(--primary); color: var(--white); }
+    .btn-sm-secondary { background: var(--secondary); color: var(--white); }
+    .btn-sm-info { background: var(--primary-dark); color: var(--white); }
+
+    .project-deadline {
+        font-size: 0.9rem;
+        color: var(--text-sub);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .deadline-overdue { color: var(--accent); margin-left: 0.5rem; }
+    .deadline-soon { color: #f1c40f; margin-left: 0.5rem; }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #ecf0f1;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .pagination-wrapper {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .pagination {
+        display: inline-flex;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--light-blur-bg);
+        color: var(--text-main);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+    }
+
+    .page-link:hover {
+        background: var(--accent-light);
+        color: var(--accent);
+    }
+
+    .page-link.active {
+        background: var(--accent);
+        color: var(--white);
+    }
+
+    .page-link.disabled {
+        background: rgba(189, 195, 199, 0.5);
+        color: var(--text-sub);
+        cursor: default;
+    }
+
+    @media (max-width: 768px) {
+        .container { padding: 1rem; }
+        .admin-navbar { padding: 1rem; }
+        .admin-nav { gap: 1rem; }
+        .projects-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="admin-logo">
+            <i class="fas fa-crown"></i> Administration
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{{ url_for('admin.manage_projects') }}" class="active">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-header">
+            <div>
+                <h1 class="admin-title">
+                    <i class="fas fa-project-diagram"></i>
+                    {% if current_user.role.value == 'admin' %}
+                        Tous les Projets
+                    {% else %}
+                        Mes Projets
+                    {% endif %}
+                </h1>
+                <p class="admin-subtitle">Gérez vos projets collaboratifs</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('project.create_project') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nouveau Projet
+                </a>
+                {% if current_user.role.value == 'admin' %}
+                <button class="btn btn-secondary" onclick="toggleBulkActions()">
+                    <i class="fas fa-tasks"></i> Actions groupées
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if current_user.role.value == 'admin' %}
+        <div id="bulk-actions" class="bulk-actions-panel" style="display: none;">
+            <form id="bulk-form" method="POST" action="{{ url_for('project.bulk_project_actions') }}" onsubmit="return confirmBulkAction()">
+                <div class="bulk-controls">
+                    <select name="action" required>
+                        <option value="">Choisir une action...</option>
+                        <option value="activate">Activer</option>
+                        <option value="deactivate">Désactiver</option>
+                        <option value="delete">Supprimer</option>
+                    </select>
+                    <button type="submit" class="btn btn-warning">Exécuter</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleBulkActions()">Annuler</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="projects-grid">
+            {% for project in projects.items %}
+            <div class="project-card {% if not project.is_active %}project-inactive{% endif %}">
+                {% if current_user.role.value == 'admin' %}
+                <div class="bulk-checkbox">
+                    <input type="checkbox" name="project_ids" value="{{ project.id }}" form="bulk-form">
+                </div>
+                {% endif %}
+                
+                <div class="project-header">
+                    <h3 class="project-title">
+                        <a href="{{ url_for('project.project_detail', project_id=project.id) }}">
+                            {{ project.name }}
+                        </a>
+                    </h3>
+                    <div class="project-status">
+                        {% if project.is_active %}
+                            <span class="status-badge status-active">Actif</span>
+                        {% else %}
+                            <span class="status-badge status-inactive">Inactif</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-user"></i>
+                        <span>{{ project.owner.full_name }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>{{ project.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-users"></i>
+                        <span>{{ project.members.count() }} membre(s)</span>
+                    </div>
+                </div>
+
+                {% if project.description %}
+                <p class="project-description">{{ project.description[:100] }}{% if project.description|length > 100 %}...{% endif %}</p>
+                {% endif %}
+
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span>Progression</span>
+                        <span class="progress-percentage">{{ project.progress_percentage }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ project.progress_percentage }}%"></div>
+                    </div>
+                </div>
+
+                <div class="task-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ project.task_counts.todo }}</span>
+                        <span class="stat-label">À faire</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ project.task_counts.in_progress }}</span>
+                        <span class="stat-label">En cours</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ project.task_counts.completed }}</span>
+                        <span class="stat-label">Terminées</span>
+                    </div>
+                </div>
+
+                <div class="project-actions">
+                    <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn-sm btn-sm-primary">
+                        <i class="fas fa-eye"></i> Voir
+                    </a>
+                    {% if current_user.role.value == 'admin' or project.owner_id == current_user.id %}
+                    <a href="{{ url_for('project.edit_project', project_id=project.id) }}" class="btn-sm btn-sm-secondary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('project.project_members', project_id=project.id) }}" class="btn-sm btn-sm-info">
+                        <i class="fas fa-users"></i> Équipe
+                    </a>
+                </div>
+
+                {% if project.deadline %}
+                <div class="project-deadline">
+                    <i class="fas fa-clock"></i>
+                    Échéance: {{ project.deadline.strftime('%d/%m/%Y') }}
+                    {% if project.days_left is not none %}
+                        {% if project.days_left < 0 %}
+                            <span class="deadline-overdue">({{ -project.days_left }} jour(s) de retard)</span>
+                        {% elif project.days_left <= 7 %}
+                            <span class="deadline-soon">({{ project.days_left }} jour(s) restant(s))</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Aucun projet trouvé</h3>
+                <p>Commencez par créer votre premier projet collaboratif</p>
+                <a href="{{ url_for('project.create_project') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Créer un projet
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if projects.pages > 1 %}
+        <div class="pagination-wrapper">
+            <div class="pagination">
+                {% if projects.has_prev %}
+                    <a href="{{ url_for('project.project_list', page=projects.prev_num) }}" class="page-link">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                {% endif %}
+                
+                {% for page_num in projects.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != projects.page %}
+                            <a href="{{ url_for('project.project_list', page=page_num) }}" class="page-link">{{ page_num }}</a>
+                        {% else %}
+                            <span class="page-link active">{{ page_num }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="page-link disabled">...</span>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if projects.has_next %}
+                    <a href="{{ url_for('project.project_list', page=projects.next_num) }}" class="page-link">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+    function toggleBulkActions() {
+        const panel = document.getElementById('bulk-actions');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        
+        if (panel.style.display === 'none') {
+            document.querySelectorAll('input[name="project_ids"]').forEach(cb => cb.checked = false);
+        }
+    }
+
+    function confirmBulkAction() {
+        const checkedBoxes = document.querySelectorAll('input[name="project_ids"]:checked');
+        const action = document.querySelector('select[name="action"]').value;
+        
+        if (checkedBoxes.length === 0) {
+            alert('Veuillez sélectionner au moins un projet.');
+            return false;
+        }
+        
+        const actionTexts = {
+            'activate': 'activer',
+            'deactivate': 'désactiver',
+            'delete': 'supprimer définitivement'
+        };
+        
+        return confirm(`Êtes-vous sûr de vouloir ${actionTexts[action]} ${checkedBoxes.length} projet(s) ?`);
+    }
+    </script>
+</body>
+</html>

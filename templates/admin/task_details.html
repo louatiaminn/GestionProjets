@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Détails-Projet</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script>
+    window.projectId = {{ project.id }};
+</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-navbar {
+            background: rgba(52, 73, 94, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .admin-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color, #3498db);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            color: var(--accent-color, #3498db);
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .stat-change.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #e74c3c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .activities-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-name {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* Additional styles for the project specific elements */
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+
+        .btn-outline-primary:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .task-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-à-faire {
+            background: #f39c12;
+        }
+
+        .status-en-cours {
+            background: #3498db;
+        }
+
+        .status-terminé {
+            background: #27ae60;
+        }
+
+        .task-info {
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-project {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .bg-warning {
+            background: #f39c12 !important;
+        }
+
+        .bg-info {
+            background: #3498db !important;
+        }
+
+        .bg-success {
+            background: #27ae60 !important;
+        }
+
+        .text-dark {
+            color: #2c3e50 !important;
+        }
+
+        .text-white {
+            color: white !important;
+        }
+
+        .text-secondary {
+            color: #7f8c8d !important;
+        }
+
+        .text-muted {
+            color: #95a5a6 !important;
+        }
+
+        .text-warning {
+            color: #f39c12 !important;
+        }
+
+        .text-info {
+            color: #3498db !important;
+        }
+
+        .text-success {
+            color: #27ae60 !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Comment Section Styles */
+        .comment-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .comment-form {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .comment-item:hover {
+            background: #e9ecef;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .comment-author-info h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .comment-content {
+            color: #2c3e50;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .edit-form {
+            margin-top: 1rem;
+        }
+
+        .edit-form textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .edit-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .justify-content-end {
+            justify-content: flex-end;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .d-inline-block {
+            display: inline-block;
+        }
+
+        .small {
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section, .activities-section {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .admin-navbar {
+                padding: 1rem;
+            }
+
+            .admin-nav {
+                gap: 1rem;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .justify-content-between {
+                justify-content: flex-start;
+            }
+
+            .comment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .comment-actions {
+                align-self: flex-end;
+            }
+        }
+        .avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.comment-item {
+    background-color: #f8f9fa;
+    transition: all 0.2s;
+}
+
+.comment-item:hover {
+    background-color: #e9ecef;
+}
+.comment-section .card {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+.comment-section .card-header {
+  background: transparent;
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+}
+.comment-section .card-body {
+  padding: 1.5rem;
+}
+.comment-section .form-group {
+  margin-bottom: 1rem;
+}
+.comment-section .dropdown-menu {
+  min-width: auto;
+  padding: 0.5rem;
+}
+.comment-section .dropdown-item {
+  font-size: 0.9rem;
+}
+.status-btn {
+    border: none;
+    font-weight: 500;
+}
+
+.status-btn.status-todo {
+    background-color: #6c757d;
+    color: white;
+}
+
+.status-btn.status-in_progress {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-btn.status-completed {
+    background-color: #198754;
+    color: white;
+}
+
+.status-btn:hover {
+    opacity: 0.8;
+}
+
+.task-checkbox {
+    transform: scale(1.2);
+}
+
+.bulk-mode .task-checkbox,
+.bulk-mode #select-all {
+    display: block !important;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="admin-logo">
+            <i class="fas fa-crown"></i> Administration
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin.admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{{ url_for('admin.manage_projects') }}">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+            <a href="{{ url_for('project.project_detail', project_id=project.id) }}">
+                <i class="fas fa-arrow-left"></i> Retour au Projet
+            </a>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 2rem 0;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">
+                <i class="bi bi-list-task"></i> Gestion des Tâches - {{ project.name }}
+            </h2>
+            <div class="quick-actions">
+                <a href="{{ url_for('project.add_task', project_id=project.id) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nouvelle Tâche
+                </a>
+            </div>
+        </div>
+
+        <div id="alertContainer">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Task Statistics -->
+        <section class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon text-warning"><i class="bi bi-list-task"></i></div>
+                <span class="stat-number" id="todoCount">{{ task_stats.todo }}</span>
+                <span class="stat-label">À faire</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon text-info"><i class="bi bi-arrow-repeat"></i></div>
+                <span class="stat-number" id="inProgressCount">{{ task_stats.in_progress }}</span>
+                <span class="stat-label">En cours</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon text-success"><i class="bi bi-check-circle"></i></div>
+                <span class="stat-number" id="completedCount">{{ task_stats.completed }}</span>
+                <span class="stat-label">Terminées</span>
+            </div>
+        </section>
+
+        <!-- Bulk Actions -->
+        {% if tasks %}
+        <div class="section-card mb-4">
+            <h5 class="mb-3"><i class="fas fa-tasks"></i> Actions Groupées</h5>
+            <form method="POST" action="{{ url_for('project.bulk_update_task_status', project_id=project.id) }}" id="bulkUpdateForm">
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <label for="bulk_status" class="form-label">Nouveau statut :</label>
+                        <select name="bulk_status" id="bulk_status" class="form-select" required>
+                            <option value="">-- Choisir un statut --</option>
+                            <option value="todo">À faire</option>
+                            <option value="in_progress">En cours</option>
+                            <option value="completed">Terminée</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-warning" disabled id="bulkUpdateBtn">
+                            <i class="fas fa-edit"></i> Mettre à jour les tâches sélectionnées
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="selectAllTasks()">
+                            <i class="fas fa-check-square"></i> Tout sélectionner
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="deselectAllTasks()">
+                            <i class="fas fa-square"></i> Tout désélectionner
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <span id="selectedCount">0</span> tâche(s) sélectionnée(s)
+                    </small>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Tasks List -->
+        <section class="section-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="section-title mb-0">
+                    <i class="bi bi-kanban"></i> Liste des Tâches
+                </h3>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="statusFilter" id="filter-all" value="all" checked>
+                    <label class="btn btn-outline-primary" for="filter-all">Toutes</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="filter-todo" value="todo">
+                    <label class="btn btn-outline-warning" for="filter-todo">À faire</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="filter-progress" value="in_progress">
+                    <label class="btn btn-outline-info" for="filter-progress">En cours</label>
+                    
+                    <input type="radio" class="btn-check" name="statusFilter" id="filter-completed" value="completed">
+                    <label class="btn btn-outline-success" for="filter-completed">Terminées</label>
+                </div>
+            </div>
+
+            {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="40">
+                                    <input type="checkbox" id="selectAllCheckbox" class="form-check-input">
+                                </th>
+                                <th>Tâche</th>
+                                <th>Échéance</th>
+                                <th>Créée le</th>
+                                <th>Mise à jour</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTableBody">
+                            {% for task in tasks %}
+                            <tr class="task-row" data-status="{{ task.status.value }}" data-task-id="{{ task.id }}">
+                                <td>
+                                    <input type="checkbox" name="task_ids" value="{{ task.id }}" 
+                                           class="form-check-input task-checkbox" form="bulkUpdateForm">
+                                </td>
+                                <td>
+                                    <div class="task-info">
+                                        <div class="task-title fw-bold">{{ task.title }}</div>
+                                        {% if task.description %}
+                                            <div class="task-description text-muted small">
+                                                {{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>  
+                                <td>
+                                    {% if task.due_date %}
+                                        {% set task_due_date = task.due_date.date() if task.due_date.date is defined else task.due_date %}
+                                        {% set is_overdue = task_due_date < today and task.status.value != 'completed' %}
+                                        <span class="badge bg-{{ 'danger' if is_overdue else 'secondary' }}">
+                                            {{ task_due_date.strftime('%d/%m/%Y') }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ task.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-muted task-updated-at">
+                                        {{ task.updated_at.strftime('%d/%m/%Y à %H:%M') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('project.edit_task', project_id=project.id, task_id=task.id) }}" 
+                                           class="btn btn-outline-primary btn-sm" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-info btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#taskModal{{ task.id }}" title="Détails">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <form action="{{ url_for('project.delete_task', project_id=project.id, task_id=task.id) }}" 
+                                              method="POST" class="d-inline" 
+                                              onsubmit="return confirm('Supprimer cette tâche ?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state text-center py-5">
+                    <i class="bi bi-inbox-fill text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">Aucune tâche trouvée</h5>
+                    <p class="text-muted">Commencez par ajouter votre première tâche à ce projet.</p>
+                    <a href="{{ url_for('project.add_task', project_id=project.id) }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ajouter une tâche
+                    </a>
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Task Detail Modals -->
+        {% for task in tasks %}
+        <div class="modal fade" id="taskModal{{ task.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ task.title }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if task.description %}
+                            <div class="mb-3">
+                                <strong>Description :</strong>
+                                <p class="mt-2">{{ task.description }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Statut :</strong>
+                                {% if task.status.value == 'todo' %}
+                                    <span class="badge bg-warning text-dark">À faire</span>
+                                {% elif task.status.value == 'in_progress' %}
+                                    <span class="badge bg-info">En cours</span>
+                                {% elif task.status.value == 'completed' %}
+                                    <span class="badge bg-success">Terminée</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if task.due_date %}
+                                    {% set task_due_date = task.due_date.date() if task.due_date.date is defined else task.due_date %}
+                                    {% set is_overdue = task_due_date < today and task.status.value != 'completed' %}
+                                    <strong>Échéance :</strong>
+                                    <span class="badge bg-{{ 'danger' if is_overdue else 'secondary' }}">
+                                        {{ task_due_date.strftime('%d/%m/%Y') }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <strong>Créée le :</strong><br>
+                                <small class="text-muted">{{ task.created_at.strftime('%d/%m/%Y à %H:%M') }}</small>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Dernière mise à jour :</strong><br>
+                                <small class="text-muted">{{ task.updated_at.strftime('%d/%m/%Y à %H:%M') }}</small>
+                            </div>
+                        </div>
+                        
+                        {% if task.completed_at %}
+                            <div class="mt-3">
+                                <strong>Terminée le :</strong><br>
+                                <small class="text-success">{{ task.completed_at.strftime('%d/%m/%Y à %H:%M') }}</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ url_for('project.edit_task', project_id=project.id, task_id=task.id) }}" 
+                           class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update individual status
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const taskId = this.dataset.taskId;
+                    const projectId = this.dataset.projectId;
+                    const newStatus = this.value;
+                    this.disabled = true;
+                    fetch(`/${projectId}/tasks/${taskId}/update_status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `status=${newStatus}`
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update stats
+                            document.getElementById('todoCount').textContent = data.task_stats.todo;
+                            document.getElementById('inProgressCount').textContent = data.task_stats.in_progress;
+                            document.getElementById('completedCount').textContent = data.task_stats.completed;
+                            // Update updated_at timestamp in row
+                            const row = document.querySelector(`.task-row[data-task-id='${taskId}']`);
+                            row.querySelector('.task-updated-at').textContent = data.updated_at;
+                        } else {
+                            alert('La mise à jour a échoué.');
+                            select.value = select.getAttribute('data-original') || select.value;
+                        }
+                    })
+                    .catch(() => alert('Erreur réseau.'))
+                    .finally(() => this.disabled = false);
+                });
+            });
+
+            // Bulk selection logic
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const bulkBtn = document.getElementById('bulkUpdateBtn');
+            const selectedCountEl = document.getElementById('selectedCount');
+
+            function updateBulkState() {
+                const selected = Array.from(checkboxes).filter(cb => cb.checked).length;
+                selectedCountEl.textContent = selected;
+                bulkBtn.disabled = selected === 0;
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateBulkState));
+
+            document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+                const checked = this.checked;
+                checkboxes.forEach(cb => cb.checked = checked);
+                updateBulkState();
+            });
+
+            window.selectAllTasks = () => {
+                checkboxes.forEach(cb => cb.checked = true);
+                document.getElementById('selectAllCheckbox').checked = true;
+                updateBulkState();
+            };
+
+            window.deselectAllTasks = () => {
+                checkboxes.forEach(cb => cb.checked = false);
+                document.getElementById('selectAllCheckbox').checked = false;
+                updateBulkState();
+            };
+
+            // Filter tasks by status
+            document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const filter = document.querySelector('input[name="statusFilter"]:checked').value;
+                    document.querySelectorAll('.task-row').forEach(row => {
+                        row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

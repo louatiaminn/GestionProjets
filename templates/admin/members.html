@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membres - {{ project.name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.admin-navbar {
+    background: rgba(52, 73, 94, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.admin-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.admin-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.admin-title {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-subtitle {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent-color, #3498db);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+    color: var(--accent-color, #3498db);
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-change {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.stat-change.positive {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+}
+
+.stat-change.negative {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.section-title {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 300px;
+}
+
+.activities-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.activity-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.activity-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.activity-info {
+    flex-grow: 1;
+}
+
+.activity-name {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.activity-meta {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.fab {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+}
+
+.status-inactive {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.section-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #3498db;
+    border: 2px solid #3498db;
+}
+
+.btn-outline-primary:hover {
+    background: #3498db;
+    color: white;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.task-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-à-faire {
+    background: #f39c12;
+}
+
+.status-en-cours {
+    background: #3498db;
+}
+
+.status-terminé {
+    background: #27ae60;
+}
+
+.task-info {
+    flex-grow: 1;
+}
+
+.task-title {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.task-project {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.25rem;
+}
+
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.bg-warning {
+    background: #f39c12 !important;
+}
+
+.bg-info {
+    background: #3498db !important;
+}
+
+.bg-success {
+    background: #27ae60 !important;
+}
+
+.text-dark {
+    color: #2c3e50 !important;
+}
+
+.text-white {
+    color: white !important;
+}
+
+.text-secondary {
+    color: #7f8c8d !important;
+}
+
+.text-muted {
+    color: #95a5a6 !important;
+}
+
+.text-warning {
+    color: #f39c12 !important;
+}
+
+.text-info {
+    color: #3498db !important;
+}
+
+.text-success {
+    color: #27ae60 !important;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #7f8c8d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.justify-content-end {
+    justify-content: flex-end;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.d-inline-block {
+    display: inline-block;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .charts-section, .activities-section {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .admin-navbar {
+        padding: 1rem;
+    }
+
+    .admin-nav {
+        gap: 1rem;
+    }
+
+    .quick-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .justify-content-between {
+        justify-content: flex-start;
+    }
+}
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <!-- Header and Breadcrumb -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="admin-header">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_list') }}">
+                                    <i class="fas fa-folder me-1"></i>Projets
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('project.project_detail', project_id=project.id) }}">
+                                    {{ project.name }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Membres</li>
+                        </ol>
+                    </nav>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="admin-title">
+                                <i class="fas fa-users text-primary"></i>
+                                Membres du projet
+                            </h1>
+                            <p class="text-muted mb-0" style="font-size: 1.1rem;">{{ project.name }}</p>
+                        </div>
+                        <div class="stats-card text-center">
+                            <h3 class="mb-0" style="color: #2c3e50;">{{ members|length }}</h3>
+                            <small style="color: #7f8c8d;">Membre{{ 's' if members|length > 1 else '' }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else ('warning' if category == 'warning' else 'success') }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else ('exclamation-circle' if category == 'warning' else 'check-circle') }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <!-- Current Members -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0" style="color: #2c3e50;">
+                            <i class="fas fa-users me-2"></i>
+                            Membres actuels ({{ members|length }})
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if members %}
+                            <div class="row g-3">
+                                {% for member in members %}
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="member-card card h-100">
+                                            <div class="card-body text-center">
+                                                <!-- Avatar -->
+                                                <div class="mb-3">
+                                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                                         style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                                        {{ member.first_name[0] }}{{ member.last_name[0] }}
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Member Info -->
+                                                <h6 class="card-title mb-1">{{ member.full_name }}</h6>
+                                                <p class="text-muted small mb-2">{{ member.email }}</p>
+                                                
+                                                <!-- Role Badge -->
+                                                {% if member.id == project.owner_id %}
+                                                    <span class="badge owner-badge mb-2">
+                                                        <i class="fas fa-crown me-1"></i>Propriétaire
+                                                    </span>
+                                                {% elif member.role.value == 'admin' %}
+                                                    <span class="badge admin-badge mb-2">
+                                                        <i class="fas fa-shield-alt me-1"></i>Admin
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge member-badge mb-2">
+                                                        <i class="fas fa-user me-1"></i>Membre
+                                                    </span>
+                                                {% endif %}
+                                                
+                                                <!-- Actions -->
+                                                {% if (current_user.role.value == 'admin' or project.owner_id == current_user.id) and member.id != project.owner_id %}
+                                                    <div class="mt-3">
+                                                        <form method="POST" action="{{ url_for('project.remove_member', project_id=project.id, user_id=member.id) }}" 
+                                                              onsubmit="return confirm('Êtes-vous sûr de vouloir retirer {{ member.full_name }} du projet ?')" class="d-inline">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-user-minus me-1"></i>Retirer
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
+                                <h5 class="text-muted mt-3">Aucun membre</h5>
+                                <p class="text-muted">Ce projet n'a pas encore de membres.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Member Section -->
+            <div class="col-lg-4">
+                {% if current_user.role.value == 'admin' or project.owner_id == current_user.id %}
+                    <div class="add-member-section p-4 mb-4">
+                        <h5 class="text-center mb-3">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Ajouter un membre
+                        </h5>
+                        
+                        {% if available_users %}
+                            <form method="POST" action="{{ url_for('project.add_member', project_id=project.id) }}">
+                                <div class="mb-3">
+                                    <label for="user_id" class="form-label">Sélectionner un utilisateur</label>
+                                    <select name="user_id" id="user_id" class="form-select" required>
+                                        <option value="">Choisir un utilisateur...</option>
+                                        {% for user in available_users %}
+                                            <option value="{{ user.id }}">
+                                                {{ user.full_name }} ({{ user.email }})
+                                                {% if user.role.value == 'admin' %} - Admin{% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus me-2"></i>Ajouter au projet
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="text-center">
+                                <i class="fas fa-info-circle text-muted mb-2" style="font-size: 2rem;"></i>
+                                <p class="text-muted mb-0">Tous les utilisateurs actifs sont déjà membres de ce projet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <!-- Project Info Card -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informations du projet
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Propriétaire:</strong><br>
+                            <span class="text-muted">{{ project.owner.full_name }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Créé le:</strong><br>
+                            <span class="text-muted">{{ project.created_at.strftime('%d/%m/%Y') }}</span>
+                        </div>
+                        
+                        {% if project.deadline %}
+                            <div class="mb-3">
+                                <strong>Échéance:</strong><br>
+                                <span class="text-muted">{{ project.deadline.strftime('%d/%m/%Y') }}</span>
+                                {% if project.days_left is not none %}
+                                    {% if project.days_left > 0 %}
+                                        <small class="text-success d-block">{{ project.days_left }} jour{{ 's' if project.days_left > 1 else '' }} restant{{ 's' if project.days_left > 1 else '' }}</small>
+                                    {% elif project.days_left == 0 %}
+                                        <small class="text-warning d-block">Échéance aujourd'hui</small>
+                                    {% else %}
+                                        <small class="text-danger d-block">En retard de {{ -project.days_left }} jour{{ 's' if -project.days_left > 1 else '' }}</small>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-0">
+                            <strong>Progression:</strong><br>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ project.progress_percentage }}%"
+                                     aria-valuenow="{{ project.progress_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ project.progress_percentage }}% complété</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <a href="{{ url_for('project.project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour au projet
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
