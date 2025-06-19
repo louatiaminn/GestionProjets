@@ -12,29 +12,7 @@
         <div class="floating-element"></div>
         <div class="floating-element"></div>
         <div class="floating-element"></div>
-    </div>
-    {% if current_user.is_authenticated and current_user.role == 'admin' %}
-        <header class="admin-header">
-            <div class="containers">
-                <div class="logo">
-                    <div class="logo-icon admin-icon"></div>
-                    <h1><a href="{{ url_for('admin.dashboard') }}">GestPro Admin</a></h1>
-                </div>
-                <nav class="admin-nav">
-                    <ul>
-                        <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
-                        <li><a href="{{ url_for('admin.users') }}" class="nav-link">Utilisateurs</a></li>
-                        <li><a href="{{ url_for('admin.projects') }}" class="nav-link">Tous les Projets</a></li>
-                        <li><a href="{{ url_for('admin.settings') }}" class="nav-link">Paramètres</a></li>
-                        <li class="divider"></li>
-                        <li><a href="{{ url_for('index') }}" class="nav-link">Vue Utilisateur</a></li>
-                        <li><a href="#" class="user-menu admin-user">{{ current_user.first_name }} (Admin)</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}" class="btn-logout">Déconnexion</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-    {% else %}
+    </div>        
         <header class="user-header">
             <div class="containers">
                 <div class="logo">
@@ -44,21 +22,17 @@
                 <nav class="user-nav">
                     <ul>
                         {% if current_user.is_authenticated %}
-                            <li><a href="{{ url_for('index') }}" class="nav-link">Mes Projets</a></li>
-                            <li><a href="{{ url_for('project.create_project') }}" class="nav-link">Nouveau Projet</a></li>
+                            <li><a href="{{ url_for('project.project_list') }}" class="nav-link">Mes Projets</a></li>
                             <li class="divider"></li>
-                            <li><a href="#" class="user-menu">{{ current_user.first_name }}</a></li>
+                            <li><a href="{{ url_for('profile.view_profile')}}" class="user-menu">{{ current_user.first_name }}</a></li>
                             <li><a href="{{ url_for('auth.logout') }}" class="btn-logout">Déconnexion</a></li>
                         {% else %}
                             <li><a href="{{ url_for('auth.login') }}" class="nav-link">Connexion</a></li>
-                            <li><a href="{{ url_for('auth.register') }}" class="nav-link btn-register">Inscription</a></li>
                         {% endif %}
                     </ul>
                 </nav>
             </div>
         </header>
-    {% endif %}
-    
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -75,8 +49,7 @@
         
         {% block content %}{% endblock %}
     </main>
-    
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         setTimeout(() => {
             document.querySelectorAll('.flash-message').forEach(msg => {
@@ -84,15 +57,6 @@
                 setTimeout(() => msg.remove(), 300);
             });
         }, 5000);
-
-        if (document.querySelector('.admin-header')) {
-            const currentPath = window.location.pathname;
-            document.querySelectorAll('.admin-nav .nav-link').forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-        }
     </script>
 </body>
 </html>

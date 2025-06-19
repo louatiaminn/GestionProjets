@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, SubmitField, SelectField, DateTimeField, IntegerField
-from wtforms.validators import DataRequired, Length, Optional, NumberRange
+from wtforms.validators import DataRequired, Length, Optional, NumberRange, ValidationError
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, DateTimeField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
@@ -34,8 +34,15 @@ class TaskForm(FlaskForm):
 class ProjectForm(FlaskForm):
     name = StringField('Nom du projet', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description du projet')
-    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d')
+    start_date = DateField('Date de début (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
+    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Créer le projet')
+    
+    def validate_deadline(self, field):
+        """Validate that deadline is after start date"""
+        if field.data and self.start_date.data:
+            if field.data <= self.start_date.data:
+                raise ValidationError('La date limite doit être postérieure à la date de début.')
 
 class CommentForm(FlaskForm):
     content = TextAreaField('Contenu du commentaire', validators=[DataRequired()])
@@ -50,8 +57,15 @@ class EditTaskForm(FlaskForm):
 class EditProjectForm(FlaskForm):
     name = StringField('Nom du projet', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description du projet')
-    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d')
+    start_date = DateField('Date de début (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
+    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Modifier le projet')
+    
+    def validate_deadline(self, field):
+        """Validate that deadline is after start date"""
+        if field.data and self.start_date.data:
+            if field.data <= self.start_date.data:
+                raise ValidationError('La date limite doit être postérieure à la date de début.')
 
 class EditCommentForm(FlaskForm):
     content = TextAreaField('Contenu du commentaire', validators=[DataRequired()])
@@ -104,8 +118,15 @@ class AddTaskForm(FlaskForm):
 class AddProjectForm(FlaskForm):
     name = StringField('Nom du projet', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description du projet')
-    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d')
+    start_date = DateField('Date de début (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
+    deadline = DateField('Date limite (YYYY-MM-DD)', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Créer le projet')
+    
+    def validate_deadline(self, field):
+        """Validate that deadline is after start date"""
+        if field.data and self.start_date.data:
+            if field.data <= self.start_date.data:
+                raise ValidationError('La date limite doit être postérieure à la date de début.')
 
 class AddCommentForm(FlaskForm):
     content = TextAreaField('Contenu du commentaire', validators=[DataRequired()])

@@ -12,9 +12,6 @@
             <a href="{{ url_for('admin.manage_projects') }}" class="active">
                 <i class="fas fa-project-diagram"></i> Projets
             </a>
-            <a href="{{ url_for('admin.admin_dashboard') }}">
-                <i class="fas fa-arrow-left"></i> Retour
-            </a>
             <a href="{{ url_for('auth.logout') }}">
                 <i class="fas fa-sign-out-alt"></i> Déconnexion
             </a>
@@ -42,11 +39,9 @@
         <p>Aucun projet à afficher.</p>
       </div>
     {% else %}
-      <!-- Grille de projets (chaque projet est une "project-item") -->
       <div class="main-grid">
         {% for projet in projects.items %}
           <div class="project-item">
-            <!-- Colonne principale : infos du projet -->
             <div class="project-info">
               <h4>{{ projet.name }}</h4>
               <div class="project-meta">

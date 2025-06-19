@@ -6,11 +6,8 @@
         <h1 class="welcome-title">Bienvenue, {{ current_user.first_name }}!</h1>
         <p class="welcome-subtitle">Voici un aperçu de vos projets et tâches en cours. Gérez efficacement votre travail et suivez vos progrès.</p>
         <div class="quick-actions">
-            <a href="{{ url_for('project.create_project') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Nouveau Projet
-            </a>
-            <a href="{{ url_for('project.project_list') }}" class="btn btn-outline-primary">
-                <i class="fas fa-list"></i> Tous mes Projets
+            <a href="{{ url_for('project.project_list') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tous mes Projets
             </a>
         </div>
     </div>
@@ -43,8 +40,7 @@
             <h2 class="section-title">
                 <i class="fas fa-folder-open"></i> Mes Projets Récents
             </h2>
-            
-            {% if all_projects %}
+                {% if all_projects %}
                 {% for project in all_projects[:4] %}
                 <div class="project-item">
                     <div class="project-info">
@@ -73,7 +69,6 @@
                     </div>
                 </div>
                 {% endfor %}
-
                 {% if all_projects|length > 4 %}
                 <div style="text-align: center; margin-top: 1.5rem;">
                     <a href="{{ url_for('project.project_list') }}" class="btn btn-outline-secondary btn-sm">
@@ -86,9 +81,6 @@
                     <i class="fas fa-folder-plus"></i>
                     <p>Aucun projet pour le moment</p>
                     <small>Créez votre premier projet pour commencer à organiser votre travail</small>
-                    <a href="{{ url_for('project.create_project') }}" class="btn btn-primary" style="margin-top: 1rem;">
-                        <i class="fas fa-plus"></i> Créer un projet
-                    </a>
                 </div>
             {% endif %}
         </div>
@@ -110,7 +102,6 @@
             </div>
         </div>
     </div>
-
     {% if recent_tasks %}
     <div class="section-card">
         <h2 class="section-title">
@@ -140,8 +131,7 @@
         </div>
     </div>
     {% endif %}
-    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
     {% if todo_tasks or in_progress_tasks or completed_tasks %}
     const tasksCtx = document.getElementById('tasksChart');
@@ -185,7 +175,6 @@
         });
     }
     {% endif %}
-
     {% if project_stats %}
     const projectsCtx = document.getElementById('projectsChart');
     if (projectsCtx) {

@@ -5,10 +5,13 @@ from datetime import datetime, timedelta
 from models import Project, Task, User, TaskStatus, UserRole, Comment, db
 from sqlalchemy import desc, func
 from .forms import AddTaskForm, DeleteTaskForm, EditTaskForm, EditProjectForm
-
 from . import project
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
 
 def admin_required(f):
+    
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != UserRole.ADMIN:
@@ -65,25 +68,42 @@ def create_project():
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
+        start_date_str = request.form.get('start_date')
         deadline_str = request.form.get('deadline')
         
         if not name:
             flash('Le nom du projet est requis.', 'error')
-            return render_template('project/create.html')
+            template = 'admin/create.html' if current_user.role == UserRole.ADMIN else 'project/create.html'
+            return render_template(template)
         
-        # Parse deadline if provided
+        start_date = None
+        if start_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Format de date de début invalide.', 'error')
+                template = 'admin/create.html' if current_user.role == UserRole.ADMIN else 'project/create.html'
+                return render_template(template)
+        
         deadline = None
         if deadline_str:
             try:
                 deadline = datetime.strptime(deadline_str, '%Y-%m-%d')
             except ValueError:
-                flash('Format de date invalide.', 'error')
-                return render_template('project/create.html')
+                flash('Format de date limite invalide.', 'error')
+                template = 'admin/create.html' if current_user.role == UserRole.ADMIN else 'project/create.html'
+                return render_template(template)
+        
+        if start_date and deadline and deadline <= start_date:
+            flash('La date limite doit être postérieure à la date de début.', 'error')
+            template = 'admin/create.html' if current_user.role == UserRole.ADMIN else 'project/create.html'
+            return render_template(template)
         
         new_project = Project(
             name=name,
             description=description,
             owner_id=current_user.id,
+            start_date=start_date or datetime.utcnow(),
             deadline=deadline
         )
         
@@ -95,14 +115,17 @@ def create_project():
         
         flash(f'Projet "{name}" créé avec succès!', 'success')
         return redirect(url_for('project.project_detail', project_id=new_project.id))
-    return render_template('project/create.html')
+    
+    template = 'admin/create.html' if current_user.role == UserRole.ADMIN else 'project/create.html'
+    return render_template(template)
+
+ 
 @project.route('/<int:project_id>/add_comment', methods=['POST'])
 @login_required
 def add_task_comment_general(project_id):
     """Add a comment to a task from project detail page"""
     proj = Project.query.get_or_404(project_id)
     
-    # Check if user has access to this project
     if (current_user.role != UserRole.ADMIN and 
         proj.owner_id != current_user.id and 
         current_user not in proj.members.all()):
@@ -149,6 +172,7 @@ def edit_project(project_id):
     if form.validate_on_submit():
         proj.name        = form.name.data
         proj.description = form.description.data
+        proj.start_date  = form.start_date.data
         proj.deadline    = form.deadline.data
         proj.updated_at  = datetime.utcnow()
         db.session.commit()
@@ -158,6 +182,7 @@ def edit_project(project_id):
     if request.method == 'GET':
         form.name.data        = proj.name
         form.description.data = proj.description
+        form.start_date.data  = proj.start_date.date() if proj.start_date else None
         form.deadline.data    = proj.deadline.date() if proj.deadline else None
 
     template = 'admin/edit.html' if current_user.role == UserRole.ADMIN else 'project/edit.html'
@@ -222,6 +247,8 @@ def edit_task(project_id, task_id):
     else:
         template = 'project/edit_task.html'
     return render_template(template, project=proj, task=task, form=form)
+
+
 @project.route('/<int:project_id>/tasks/<int:task_id>/delete', methods=['POST'])
 @login_required
 def delete_task(project_id, task_id):
@@ -384,7 +411,7 @@ def delete_project(project_id):
     db.session.commit()
     flash(f'Projet "{project_name}" supprimé avec succès.', 'success')
     if current_user.role == UserRole.ADMIN:
-        return redirect(url_for('admin.project_list'))
+        return redirect(url_for('admin.manage_projects'))
     else:
         return redirect(url_for('project.project_list'))
 @project.route('/<int:project_id>/add_task', methods=['GET', 'POST'])
@@ -430,7 +457,7 @@ def add_task(project_id):
 def project_members(project_id):
     """View project members"""
     proj = Project.query.get_or_404(project_id)
-    
+
     if (current_user.role != UserRole.ADMIN and 
         proj.owner_id != current_user.id and 
         current_user not in proj.members.all()):
@@ -540,22 +567,69 @@ def add_task_comment(project_id, task_id):
     flash('Commentaire ajouté avec succès!', 'success')
     return redirect(url_for('project.project_detail', project_id=project_id))
 
+
+@project.route('/comments/<int:comment_id>/edit', methods=['POST'])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    task = comment.task
+    proj = task.project    
+    if (current_user.role != UserRole.ADMIN and 
+        proj.owner_id != current_user.id and 
+        current_user not in proj.members.all()):
+        flash('Vous n\'avez pas accès à ce projet.', 'error')
+        return redirect(url_for('project.project_list'))
+    if comment.author_id != current_user.id and current_user.role != UserRole.ADMIN:
+        flash('Vous ne pouvez modifier que vos propres commentaires.', 'error')
+        return redirect(url_for('project.project_detail', project_id=proj.id))
+    content = request.form.get('content')
+    if not content or not content.strip():
+        flash('Le contenu du commentaire ne peut pas être vide.', 'error')
+        return redirect(url_for('project.project_detail', project_id=proj.id))
+    comment.content = content.strip()
+    comment.updated_at = datetime.utcnow()    
+    print(f"DEBUG: Before commit - Comment ID: {comment.id}, Author ID: {comment.author_id}, Content: {comment.content[:30]}...")
+    db.session.commit()
+    
+    flash('Commentaire modifié avec succès!', 'success')
+    return redirect(url_for('project.project_detail', project_id=proj.id))
+
+@project.route('/comments/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    """Delete a comment - simplified route"""
+    comment = Comment.query.get_or_404(comment_id)
+    task = comment.task
+    proj = task.project
+    if (current_user.role != UserRole.ADMIN and 
+        proj.owner_id != current_user.id and 
+        current_user not in proj.members.all()):
+        flash('Vous n\'avez pas accès à ce projet.', 'error')
+        return redirect(url_for('project.project_list'))    
+    if comment.author_id != current_user.id and current_user.role != UserRole.ADMIN:
+        flash('Vous ne pouvez supprimer que vos propres commentaires.', 'error')
+        return redirect(url_for('project.project_detail', project_id=proj.id))
+    
+    project_id = proj.id 
+    db.session.delete(comment)
+    db.session.commit()
+    
+    flash('Commentaire supprimé avec succès!', 'success')
+    return redirect(url_for('project.project_detail', project_id=project_id))
 @project.route('/<int:project_id>/tasks/<int:task_id>/comments/<int:comment_id>/edit', methods=['POST'])
 @login_required
 def edit_task_comment(project_id, task_id, comment_id):
-    """Edit a task comment"""
+    """Edit a task comment - complex route version"""
     proj = Project.query.get_or_404(project_id)
     task = Task.query.filter_by(id=task_id, project_id=project_id).first_or_404()
     comment = Comment.query.filter_by(id=comment_id, task_id=task_id).first_or_404()
     
-    # Check if user has access to this project
     if (current_user.role != UserRole.ADMIN and 
         proj.owner_id != current_user.id and 
         current_user not in proj.members.all()):
         flash('Vous n\'avez pas accès à ce projet.', 'error')
         return redirect(url_for('project.project_list'))
     
-    # Check if user can edit this comment (author or admin)
     if comment.author_id != current_user.id and current_user.role != UserRole.ADMIN:
         flash('Vous ne pouvez modifier que vos propres commentaires.', 'error')
         return redirect(url_for('project.project_detail', project_id=project_id))
@@ -575,12 +649,11 @@ def edit_task_comment(project_id, task_id, comment_id):
 @project.route('/<int:project_id>/tasks/<int:task_id>/comments/<int:comment_id>/delete', methods=['POST'])
 @login_required
 def delete_task_comment(project_id, task_id, comment_id):
-    """Delete a task comment"""
+    """Delete a task comment - complex route version"""
     proj = Project.query.get_or_404(project_id)
     task = Task.query.filter_by(id=task_id, project_id=project_id).first_or_404()
     comment = Comment.query.filter_by(id=comment_id, task_id=task_id).first_or_404()
     
-    # Check if user has access to this project
     if (current_user.role != UserRole.ADMIN and 
         proj.owner_id != current_user.id and 
         current_user not in proj.members.all()):
@@ -596,7 +669,6 @@ def delete_task_comment(project_id, task_id, comment_id):
     
     flash('Commentaire supprimé avec succès!', 'success')
     return redirect(url_for('project.project_detail', project_id=project_id))
-
 @project.route('/<int:project_id>')
 @login_required
 def project_detail(project_id):

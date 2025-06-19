@@ -6,17 +6,21 @@ from . import db
 
 db = SQLAlchemy()
 
-# Enum for user roles
 class UserRole(Enum):
     ADMIN = "admin"
     MEMBER = "member"
     PROJECT_MANAGER = "project_manager" 
 
-# Enum for task status
 class TaskStatus(Enum):
     TODO = "todo"
     IN_PROGRESS = "in_progress"  
     COMPLETED = "completed"
+    
+class CommentSentiment(Enum):
+    POSITIVE = "positive"
+    NEGATIVE = "negative"
+    NEUTRAL = "neutral"
+
 
 project_members = db.Table('project_members',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -36,12 +40,14 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     
-    # Relationships
-    owned_projects = db.relationship('Project', backref='owner', lazy=True, foreign_keys='Project.owner_id')
-    assigned_tasks = db.relationship('Task', backref='assignee', lazy=True)
-    comments = db.relationship('Comment', backref='author', lazy=True)
+    owned_projects = db.relationship('Project', backref='owner', lazy=True, 
+                                   foreign_keys='Project.owner_id',
+                                   cascade='all, delete-orphan')
+    assigned_tasks = db.relationship('Task', backref='assignee', lazy=True,
+                                   cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='author', lazy=True,
+                             cascade='all, delete-orphan')
     
-    # Many-to-many relationship with projects
     projects = db.relationship('Project', secondary=project_members, 
                               back_populates='members', lazy='dynamic')
     
@@ -56,20 +62,27 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # Updated foreign key with CASCADE DELETE
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
     deadline = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
     
     @classmethod
-    def create_project(cls, name, owner, description=None, deadline=None):
-        project = cls(name=name, owner=owner, description=description, deadline=deadline)
+    def create_project(cls, name, owner, description=None, start_date=None, deadline=None):
+        project = cls(
+            name=name, 
+            owner=owner, 
+            description=description, 
+            start_date=start_date or datetime.utcnow(),
+            deadline=deadline
+        )
         db.session.add(project)
         db.session.commit()
         return project
-    
-    # Relationships
+        
     tasks = db.relationship('Task', backref='project', lazy=True, cascade='all, delete-orphan')
     members = db.relationship('User', secondary=project_members, 
                              back_populates='projects', lazy='dynamic')
@@ -101,38 +114,65 @@ class Project(db.Model):
         today = datetime.utcnow().date()
         deadline_date = self.deadline.date() if hasattr(self.deadline, 'date') else self.deadline
         return (deadline_date - today).days
+    
+    @property
+    def duration_days(self):
+        """Calculate total project duration in days"""
+        if not self.start_date or not self.deadline:
+            return None
+        start = self.start_date.date() if hasattr(self.start_date, 'date') else self.start_date
+        end = self.deadline.date() if hasattr(self.deadline, 'date') else self.deadline
+        return (end - start).days
+    
+    @property
+    def days_elapsed(self):
+        """Calculate days elapsed since project start"""
+        if not self.start_date:
+            return None
+        today = datetime.utcnow().date()
+        start = self.start_date.date() if hasattr(self.start_date, 'date') else self.start_date
+        elapsed = (today - start).days
+        return max(0, elapsed)  # Don't return negative values for future start dates
+    
+    @property
+    def is_started(self):
+        """Check if project has started"""
+        if not self.start_date:
+            return True  # If no start date, assume started
+        today = datetime.utcnow().date()
+        start = self.start_date.date() if hasattr(self.start_date, 'date') else self.start_date
+        return today >= start
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
-    assignee_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # Updated foreign key with CASCADE DELETE for assignee
+    assignee_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     status = db.Column(db.Enum(TaskStatus), default=TaskStatus.TODO)
     priority = db.Column(db.String(10), default='medium')  # low, medium, high
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     due_date = db.Column(db.DateTime)
     completed_at = db.Column(db.DateTime)
-    
-    # Relationships
     comments = db.relationship('Comment', backref='task', lazy=True, cascade='all, delete-orphan')
     
-    # Add this to your Task model in models.py
-@property
-def is_overdue(self):
-    """Check if task is overdue"""
-    if not self.due_date or self.status == TaskStatus.COMPLETED:
-        return False
-    return self.due_date.date() < datetime.utcnow().date()
-
+    @property
+    def is_overdue(self):
+        """Check if task is overdue"""
+        if not self.due_date or self.status == TaskStatus.COMPLETED:
+            return False
+        return self.due_date.date() < datetime.utcnow().date()
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sentiment = db.Column(db.Enum(CommentSentiment), default=CommentSentiment.NEUTRAL)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)    
+    
     def __repr__(self):
-        return f'<Comment {self.id}>' 
+        return f'<Comment {self.id}>'

@@ -12,12 +12,6 @@
       {% endif %}
     </h2>
 
-    <div class="quick-actions" style="margin-bottom: 1.5rem;">
-      <a href="{{ url_for('project.create_project') }}" class="btn btn-outline-primary">
-        <i class="bi bi-plus-lg"></i> Nouveau projet
-      </a>
-    </div>
-
     {% if projects.items|length == 0 %}
       <div class="empty-state">
         <i class="bi bi-folder-x"></i>

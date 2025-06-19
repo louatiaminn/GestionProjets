@@ -445,6 +445,7 @@ nav a:hover {
     outline-offset: 2px;
 }
 
+
 nav a:focus {
     outline: 2px solid var(--primary-cyan);
     outline-offset: 2px;

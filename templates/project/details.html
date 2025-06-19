@@ -7,6 +7,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
    :root {
   --primary-cyan: #00ffd5;
@@ -1011,7 +1014,6 @@ select.form-control:focus-visible {
         <ul>
           {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('index') }}" class="nav-link">Mes Projets</a></li>
-            <li><a href="{{ url_for('project.create_project') }}" class="nav-link">Nouveau Projet</a></li>
             <li class="divider"></li>
             <li><a href="#" class="user-menu">{{ current_user.first_name }}</a></li>
             <li><a href="{{ url_for('auth.logout') }}" class="btn-logout">Déconnexion</a></li>
@@ -1027,17 +1029,20 @@ select.form-control:focus-visible {
   <main class="container" style="padding: 2rem 0;">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">{{ project.name }} <i class="bi bi-kanban-fill"></i></h2>
+      {% if project.owner == current_user %}
       <div class="quick-actions">
         <a href="{{ url_for('project.edit_project', project_id=project.id) }}" class="btn btn-outline-primary">
           <i class="bi bi-pencil-square"></i> Modifier
         </a>
         <form action="{{ url_for('project.delete_project', project_id=project.id) }}" method="POST" 
               class="d-inline-block" onsubmit="return confirm('Supprimer ce projet ?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
           <button type="submit" class="btn btn-danger">
             <i class="bi bi-trash-fill"></i> Supprimer
           </button>
         </form>
       </div>
+      {% endif %}
     </div>
     {% if project.description %}
       <div class="section-card">
@@ -1066,19 +1071,13 @@ select.form-control:focus-visible {
         <span class="stat-label">Terminées</span>
       </div>
     </section>
-
-    <!-- Bouton Ajouter une tâche -->
-    <div class="quick-actions" style="justify-content: flex-end; margin-bottom: 2rem;">
-      <a href="{{ url_for('project.add_task', project_id=project.id) }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Ajouter une tâche
-      </a>
     </div>
     <section>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="section-title"><i class="bi bi-clock-history"></i> Tâches récentes</h3>
 <a href="{{ url_for('project.task_details', project_id=project.id) }}" class="btn btn-outline-primary btn-sm">
       <i class="bi bi-list-task"></i> Voir toutes les tâches
-    </a>
+    </a> 
       </div>
       <div class="section-card">
         {% if recent_tasks %}
@@ -1136,6 +1135,7 @@ select.form-control:focus-visible {
                     <div class="mb-4">
                         <h6>Ajouter un commentaire</h6>
                         <form method="POST" action="{{ url_for('project.add_task_comment_general', project_id=project.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
                             <div class="form-group mb-3">
                                 <label for="task_select">Sélectionner une tâche:</label>
                                 <select name="task_id" id="task_select" class="form-control" required>
@@ -1157,74 +1157,89 @@ select.form-control:focus-visible {
                     </div>
                     <hr>
                 {% endif %}
-                {% if comments %}
-                    {% for comment in comments %}
-                        <div class="comment-item mb-3 p-3 border rounded">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex">
-                                    <div class="avatar-circle me-3">
-                                        {{ comment.author.first_name[0] }}{{ comment.author.last_name[0] }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">{{ comment.author.full_name }}</div>
-                                        <small class="text-muted">
-                                            {{ comment.created_at.strftime('%d/%m/%Y à %H:%M') }}
-                                        </small>
-                                        <div class="badge bg-info text-dark ms-2">
-                                            {{ comment.task.title }}
-                                        </div>
-                                    </div>
-                                </div>                                
-                                {% if comment.author_id == current_user.id or current_user.role.value == 'admin' %}
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                            data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')" class="d-inline">
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fas fa-trash"></i> Supprimer
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                                {% endif %}
+            {% if comments %}
+            {% for comment in comments %}
+                <div class="comment-item mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex">
+                            <div class="avatar-circle me-3">
+                                {{ comment.author.first_name[0] }}{{ comment.author.last_name[0] }}
                             </div>
-                            
-                            <div class="comment-content mt-2" id="comment-content-{{ comment.id }}">
-                                {{ comment.content }}
-                            </div>                            
-                            <div class="comment-edit-form mt-2" id="edit-form-{{ comment.id }}" style="display: none;">
-                                    <div class="form-group mb-2">
-                                        <textarea name="content" class="form-control" rows="3" required>{{ comment.content }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-sm btn-success">Sauvegarder</button>
-                                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit({{ comment.id }})">Annuler</button>
-                                </form>
-                            </div>
-                            {% if comment.created_at != comment.updated_at %}
-                                <small class="text-muted d-block mt-1">
-                                    Modifié le {{ comment.updated_at.strftime('%d/%m/%Y à %H:%M') }}
+                            <div>
+                                <div class="fw-bold">{{ comment.author.full_name }}</div>
+                                <small class="text-muted">
+                                    {{ comment.created_at.strftime('%d/%m/%Y à %H:%M') }}
                                 </small>
-                            {% endif %}
+                                <div class="badge bg-info text-dark ms-2">
+                                    {{ comment.task.title }}
+                                </div>
+                            </div>
+                        </div>                                
+                        {% if comment.author_id == current_user.id or current_user.role.value == 'admin' %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    id="commentDropdown{{ comment.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="commentDropdown{{ comment.id }}">
+                                <li>
+                                    <button type="button" class="dropdown-item" onclick="editComment({{ comment.id }})">
+                                        <i class="fas fa-edit me-2"></i> Modifier
+                                    </button>
+                                </li>
+                                <li>
+                                    <form method="POST" action="{{ url_for('project.delete_comment', comment_id=comment.id) }}" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-trash me-2"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-comments fa-3x mb-3"></i>
-                        <h6>Aucun commentaire sur les tâches</h6>
-                        <p>Les commentaires apparaîtront ici quand ils seront ajoutés aux tâches.</p>
+                        {% endif %}
                     </div>
-                {% endif %}
+                    
+                    <div class="comment-content mt-2" id="comment-content-{{ comment.id }}">
+                        {{ comment.content }}
+                    </div>                            
+                    <div class="comment-edit-form mt-2" id="edit-form-{{ comment.id }}" style="display: none;">
+                        <form method="POST" action="{{ url_for('project.edit_comment', comment_id=comment.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <div class="form-group mb-2">
+                                <textarea name="content" class="form-control" rows="3" required>{{ comment.content }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-success">Sauvegarder</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit({{ comment.id }})">Annuler</button>
+                        </form>
+                    </div>
+                    {% if comment.created_at != comment.updated_at %}
+                        <small class="text-muted d-block mt-1">
+                            Modifié le {{ comment.updated_at.strftime('%d/%m/%Y à %H:%M') }}
+                        </small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-comments fa-3x mb-3"></i>
+                <h6>Aucun commentaire sur les tâches</h6>
+                <p>Les commentaires apparaîtront ici quand ils seront ajoutés aux tâches.</p>
             </div>
-        </div>
+        {% endif %}
     </div>
-</div>
 </section>
-</main>
-</body>
-</html>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+function editComment(commentId) {
+    document.getElementById('comment-content-' + commentId).style.display = 'none';
+    document.getElementById('edit-form-' + commentId).style.display = 'block';
+}
+
+function cancelEdit(commentId) {
+    document.getElementById('comment-content-' + commentId).style.display = 'block';
+    document.getElementById('edit-form-' + commentId).style.display = 'none';
+}
+</script>

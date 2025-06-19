@@ -25,194 +25,210 @@
             color: #333;
         }
 
-       .admin-navbar {
-    background: rgba(52, 73, 94, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+     .admin-navbar {
+            background: rgba(52, 73, 94, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
 
-.admin-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #e74c3c;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .admin-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            transform: translateY(-2px);
+        }
+        .admin-hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            gap: 0.25rem;
+            z-index: 1001;
+        }
+        .admin-hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #ecf0f1;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        .admin-hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .admin-hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .admin-hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        @media (max-width: 1200px) {
+            .admin-navbar {
+                padding: 1rem 1.5rem;
+            }
+            .admin-nav {
+                gap: 1.5rem;
+            }
+        }
+        @media (max-width: 1024px) {
+            .admin-navbar {
+                padding: 1rem;
+            }
+            .admin-nav {
+                gap: 1rem;
+            }
+            .admin-logo {
+                font-size: 1.3rem;
+            }
+            .admin-nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-navbar {
+                padding: 1rem;
+                position: relative;
+            }
+            .admin-logo {
+                font-size: 1.2rem;
+                flex: 1;
+            }
+            .admin-hamburger {
+                display: flex;
+            }
+            .admin-nav {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(52, 73, 94, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                padding: 2rem;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            .admin-nav.active {
+                display: flex;
+                opacity: 1;
+                visibility: visible;
+            }
+            .admin-nav a {
+                padding: 1rem 2rem;
+                border-radius: 15px;
+                width: auto;
+                min-width: 200px;
+                justify-content: center;
+                font-size: 1.1rem;
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px solid transparent;
+                transform: translateY(20px);
+                animation: slideInUp 0.3s ease forwards;
+            }
+            .admin-nav a:nth-child(1) { animation-delay: 0.1s; }
+            .admin-nav a:nth-child(2) { animation-delay: 0.2s; }
+            .admin-nav a:nth-child(3) { animation-delay: 0.3s; }
+            .admin-nav a:nth-child(4) { animation-delay: 0.4s; }
+            .admin-nav a:nth-child(5) { animation-delay: 0.5s; }
+                        .admin-nav a:hover, .admin-nav a.active {
+                background: rgba(231, 76, 60, 0.3);
+                border-color: #e74c3c;
+                transform: translateY(0) scale(1.05);
+            }
+        }
+        @media (max-width: 480px) {
+            .admin-navbar {
+                padding: 0.75rem;
+            }
+                        .admin-logo {
+                font-size: 1.1rem;
+                gap: 0.3rem;
+            }
+                        .admin-logo .logo-text {
+                display: none;
+            }
+            
+            .admin-logo::after {
+                content: "Admin";
+                font-size: 1rem;
+            }
+           
+            .admin-nav a {
+                min-width: 180px;
+                font-size: 1rem;
+                padding: 0.875rem 1.5rem;
+            }
+            
+            .admin-nav a .nav-text {
+                display: inline;
+            }
+        }
 
-.admin-nav {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-}
+        @media (max-width: 320px) {
+            .admin-navbar {
+                padding: 0.5rem;
+            }
+            
+            .admin-logo {
+                font-size: 1rem;
+            }
+            
+            .admin-nav a {
+                min-width: 160px;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
 
-.admin-nav a {
-    color: #ecf0f1;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.admin-nav a:hover, .admin-nav a.active {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-}
-
-/* Mobile hamburger menu button */
-.admin-hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    padding: 0.5rem;
-    background: none;
-    border: none;
-    gap: 0.25rem;
-}
-
-.admin-hamburger span {
-    width: 25px;
-    height: 3px;
-    background: #ecf0f1;
-    transition: all 0.3s ease;
-    border-radius: 2px;
-}
-
-.admin-hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.admin-hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.admin-hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Tablet Styles */
-@media (max-width: 1024px) {
-    .admin-navbar {
-        padding: 1rem 1.5rem;
-    }
-    
-    .admin-nav {
-        gap: 1.5rem;
-    }
-    
-    .admin-logo {
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .admin-navbar {
-        padding: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .admin-logo {
-        font-size: 1.2rem;
-        flex: 1;
-    }
-    
-    .admin-hamburger {
-        display: flex;
-        order: 2;
-    }
-    
-    .admin-nav {
-        display: none;
-        width: 100%;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background: rgba(52, 73, 94, 0.98);
-        backdrop-filter: blur(15px);
-        padding: 1rem 0;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        gap: 0;
-        order: 3;
-    }
-    
-    .admin-nav.active {
-        display: flex;
-    }
-    
-    .admin-nav a {
-        padding: 1rem 2rem;
-        border-radius: 0;
-        width: 100%;
-        justify-content: flex-start;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .admin-nav a:last-child {
-        border-bottom: none;
-    }
-    
-    .admin-nav a:hover, .admin-nav a.active {
-        background: rgba(231, 76, 60, 0.1);
-        padding-left: 2.5rem;
-    }
-}
-
-/* Small Mobile Styles */
-@media (max-width: 480px) {
-    .admin-navbar {
-        padding: 0.75rem;
-    }
-    
-    .admin-logo {
-        font-size: 1.1rem;
-        gap: 0.3rem;
-    }
-    
-    .admin-logo span:not(:first-child) {
-        display: none;
-    }
-    
-    .admin-nav a {
-        padding: 0.875rem 1.5rem;
-        font-size: 0.9rem;
-    }
-    
-    .admin-nav a span.nav-text {
-        display: inline;
-    }
-    
-    .admin-nav a:hover, .admin-nav a.active {
-        padding-left: 2rem;
-    }
-}
-
-/* Ultra-small screens */
-@media (max-width: 320px) {
-    .admin-navbar {
-        padding: 0.5rem;
-    }
-    
-    .admin-logo {
-        font-size: 1rem;
-    }
-    
-    .admin-nav a {
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
-    }
-}
-
+        @keyframes slideInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -911,11 +927,17 @@
     </style>
 </head>
 <body>
-   <nav class="admin-navbar">
+    <nav class="admin-navbar">
         <div class="admin-logo">
-            <i class="fas fa-crown"></i> Administration
+            <i class="fas fa-crown"></i> 
+            <span class="logo-text">Administration</span>
         </div>
-        <div class="admin-nav">
+        <button class="admin-hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+            </button>
+        <div class="admin-nav" id="nav-menu">
             <a href="{{ url_for('admin.admin_dashboard') }}" >
                 <i class="fas fa-tachometer-alt"></i> Tableau de Bord
             </a>
@@ -924,9 +946,6 @@
             </a>
             <a href="{{ url_for('admin.manage_projects') }}" class="active">
                 <i class="fas fa-project-diagram"></i> Projets
-            </a>
-            <a href="{{ url_for('admin.manage_projects') }}">
-                <i class="fas fa-arrow-left"></i> Retour
             </a>
             <a href="{{ url_for('auth.logout') }}">
                 <i class="fas fa-sign-out-alt"></i> Déconnexion
@@ -941,8 +960,9 @@
       <a href="{{ url_for('project.edit_project', project_id=project.id) }}" class="btn btn-outline-primary">
         <i class="bi bi-pencil-square"></i> Modifier
       </a>
-      <form action="{{ url_for('project.delete_project', project_id=project.id) }}" method="POST" 
-            class="d-inline-block" onsubmit="return confirm('Supprimer ce projet ?');">
+      <form action="{{ url_for('project.delete_project', project_id=project.id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Supprimer ce projet ?');">
+                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
+
         <button type="submit" class="btn btn-danger">
           <i class="bi bi-trash-fill"></i> Supprimer
         </button>
@@ -999,6 +1019,7 @@
                     <div class="mb-4">
                         <h6>Ajouter un commentaire</h6>
                         <form method="POST" action="{{ url_for('project.add_task_comment_general', project_id=project.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
                             <div class="form-group mb-3">
                                 <label for="task_select">Sélectionner une tâche:</label>
                                 <select name="task_id" id="task_select" class="form-control" required>
@@ -1020,74 +1041,82 @@
                     </div>
                     <hr>
                 {% endif %}
-                {% if comments %}
-                    {% for comment in comments %}
-                        <div class="comment-item mb-3 p-3 border rounded">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex">
-                                    <div class="avatar-circle me-3">
-                                        {{ comment.author.first_name[0] }}{{ comment.author.last_name[0] }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">{{ comment.author.full_name }}</div>
-                                        <small class="text-muted">
-                                            {{ comment.created_at.strftime('%d/%m/%Y à %H:%M') }}
-                                        </small>
-                                        <div class="badge bg-info text-dark ms-2">
-                                            {{ comment.task.title }}
-                                        </div>
-                                    </div>
-                                </div>                                
-                                {% if comment.author_id == current_user.id or current_user.role.value == 'admin' %}
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                            data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')" class="d-inline">
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fas fa-trash"></i> Supprimer
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="comment-content mt-2" id="comment-content-{{ comment.id }}">
-                                {{ comment.content }}
-                            </div>                            
-                            <div class="comment-edit-form mt-2" id="edit-form-{{ comment.id }}" style="display: none;">
-                                    <div class="form-group mb-2">
-                                        <textarea name="content" class="form-control" rows="3" required>{{ comment.content }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-sm btn-success">Sauvegarder</button>
-                                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit({{ comment.id }})">Annuler</button>
-                                </form>
-                            </div>
-                            {% if comment.created_at != comment.updated_at %}
-                                <small class="text-muted d-block mt-1">
-                                    Modifié le {{ comment.updated_at.strftime('%d/%m/%Y à %H:%M') }}
-                                </small>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-comments fa-3x mb-3"></i>
-                        <h6>Aucun commentaire sur les tâches</h6>
-                        <p>Les commentaires apparaîtront ici quand ils seront ajoutés aux tâches.</p>
+               {% if comments %}
+    {% for comment in comments %}
+        <div class="comment-item mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex">
+                    <div class="avatar-circle me-3">
+                        {{ comment.author.first_name[0] }}{{ comment.author.last_name[0] }}
                     </div>
+                    <div>
+                        <div class="fw-bold">{{ comment.author.full_name }}</div>
+                        <small class="text-muted">
+                            {{ comment.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                        </small>
+                        <div class="badge bg-info text-dark ms-2">
+                            {{ comment.task.title }}
+                        </div>
+                    </div>
+                </div>                                
+                {% if comment.author_id == current_user.id or current_user.role.value == 'admin' %}
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                            id="commentDropdown{{ comment.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="commentDropdown{{ comment.id }}">
+                        <li>
+                            <button type="button" class="dropdown-item" onclick="editComment({{ comment.id }})">
+                                <i class="fas fa-edit me-2"></i> Modifier
+                            </button>
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ url_for('project.delete_comment', comment_id=comment.id) }}" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>                
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-trash me-2"></i> Supprimer
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
                 {% endif %}
+            </div>
+            
+            <div class="comment-content mt-2" id="comment-content-{{ comment.id }}">
+                {{ comment.content }}
+            </div>                            
+            <div class="comment-edit-form mt-2" id="edit-form-{{ comment.id }}" style="display: none;">
+                <form method="POST" action="{{ url_for('project.edit_comment', comment_id=comment.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group mb-2">
+                        <textarea name="content" class="form-control" rows="3" required>{{ comment.content }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success">Sauvegarder</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit({{ comment.id }})">Annuler</button>
+                </form>
+            </div>
+            {% if comment.created_at != comment.updated_at %}
+                <small class="text-muted d-block mt-1">
+                    Modifié le {{ comment.updated_at.strftime('%d/%m/%Y à %H:%M') }}
+                </small>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center text-muted py-4">
+        <i class="fas fa-comments fa-3x mb-3"></i>
+        <h6>Aucun commentaire sur les tâches</h6>
+        <p>Les commentaires apparaîtront ici quand ils seront ajoutés aux tâches.</p>
+    </div>
+{% endif %}
             </div>
         </div>
     </div>
 </div>
 </section>
-
  <section>
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="section-title"><i class="bi bi-clock-history"></i> Tâches récentes</h3>
@@ -1122,112 +1151,66 @@
     {% endif %}
   </div>
 </section>
-
-
 </main>
 <script>
-  function editComment(commentId) {
-    document.getElementById('comment-content-' + commentId).style.display = 'none';
-    document.getElementById('edit-form-' + commentId).style.display = 'block';
+ // =============================================================================
+// COMMENT EDIT FUNCTIONALITY
+// =============================================================================
+
+function editComment(commentId) {
+    console.log('Edit comment called for ID:', commentId);
+    
+    const contentElement = document.getElementById('comment-content-' + commentId);
+    const formElement = document.getElementById('edit-form-' + commentId);
+    
+    if (!contentElement || !formElement) {
+        console.error('Could not find elements for comment ID:', commentId);
+        return;
+    }
+    
+    contentElement.style.display = 'none';
+    formElement.style.display = 'block';
+    
+    // Focus on textarea
+    const textarea = formElement.querySelector('textarea');
+    if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }
 }
+
 function cancelEdit(commentId) {
-    document.getElementById('comment-content-' + commentId).style.display = 'block';
-    document.getElementById('edit-form-' + commentId).style.display = 'none';
-}
-  function toggleEdit(commentId) {
-    const content = document.getElementById(`content-${commentId}`);
-    const editForm = document.getElementById(`edit-form-${commentId}`);
+    console.log('Cancel edit called for ID:', commentId);
     
-    if (editForm.style.display === 'none') {
-      content.style.display = 'none';
-      editForm.style.display = 'block';
-    } else {
-      content.style.display = 'block';
-      editForm.style.display = 'none';
+    const contentElement = document.getElementById('comment-content-' + commentId);
+    const formElement = document.getElementById('edit-form-' + commentId);
+    
+    if (!contentElement || !formElement) {
+        console.error('Could not find elements for comment ID:', commentId);
+        return;
     }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    const textareas = document.querySelectorAll('textarea');
-    textareas.forEach(textarea => {
-      textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = this.scrollHeight + 'px';
-      });
-    });
-  });
-function editComment(commentId) { … }
-function cancelEdit(commentId) { … }
-document.addEventListener('DOMContentLoaded', …);
-let bulkModeActive = false;
-// Update task status
+    
+    contentElement.style.display = 'block';
+    formElement.style.display = 'none';
+}
+
+// =============================================================================
+// TASK STATUS UPDATE FUNCTIONALITY
+// =============================================================================
+
 function updateTaskStatus(taskId, newStatus) {
+    console.log('Updating task status:', taskId, newStatus);
+    
     const formData = new FormData();
     formData.append('status', newStatus);
     
-   fetch(`/projects/{{ project.id }}/tasks/${taskId}/update_status`, {
-    method: 'POST',
-    body: formData
-})
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateTaskStatusUI(taskId, newStatus);
-            updateProgressBar(data.progress_percentage, data.task_stats);
-            showNotification(data.message, 'success');
-        } else {
-            showNotification(data.error || 'Erreur lors de la mise à jour', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Erreur de connexion', 'error');
-    });
-}
-
-    document.addEventListener('DOMContentLoaded', function() {
-    let bulkModeActive = false;
-
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.status-option')) {
-            e.preventDefault();
-            const option = e.target.closest('.status-option');
-            const taskId = option.closest('.status-dropdown').dataset.taskId;
-            const newStatus = option.dataset.status;
-            updateTaskStatus(taskId, newStatus);
-        }
-    });
-
-    // Auto-resize textareas
-    const textareas = document.querySelectorAll('textarea');
-    textareas.forEach(textarea => {
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
-    });
-
-    // Select all checkbox functionality
-    const selectAllCheckbox = document.getElementById('select-all');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            const taskCheckboxes = document.querySelectorAll('.task-checkbox');
-            taskCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-        });
-    }
-});
-
-// Update task status function
-function updateTaskStatus(taskId, newStatus) {
-    const formData = new FormData();
-    formData.append('status', newStatus);
+    // Get project ID from the page (you may need to adjust this)
+    const projectId = window.projectId || document.querySelector('[data-project-id]')?.getAttribute('data-project-id');
     
-    // Get CSRF token if it exists
-    const csrfToken = document.querySelector('meta[name=csrf-token]');
-    const headers = {};
-    if (csrfToken) {
-        headers['X-CSRFToken'] = csrfToken.getAttribute('content');
+    if (!projectId) {
+        console.error('Project ID not found');
+        showNotification('Erreur: ID du projet non trouvé', 'error');
+        return;
     }
     
     // Show loading state
@@ -1237,10 +1220,12 @@ function updateTaskStatus(taskId, newStatus) {
         statusBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
     }
     
-    fetch(`/projects/${window.projectId}/tasks/${taskId}/update_status`, {
+    fetch(`/projects/${projectId}/tasks/${taskId}/update_status`, {
         method: 'POST',
         body: formData,
-        headers: headers
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     })
     .then(response => {
         if (!response.ok) {
@@ -1251,7 +1236,9 @@ function updateTaskStatus(taskId, newStatus) {
     .then(data => {
         if (data.success) {
             updateTaskStatusUI(taskId, newStatus);
-            updateProgressBar(data.progress_percentage, data.task_stats);
+            if (data.progress_percentage !== undefined) {
+                updateProgressBar(data.progress_percentage, data.task_stats);
+            }
             showNotification(data.message, 'success');
         } else {
             showNotification(data.message || 'Erreur lors de la mise à jour', 'error');
@@ -1269,33 +1256,11 @@ function updateTaskStatus(taskId, newStatus) {
         }
     });
 }
-function updateTaskStatus(taskId, newStatus) {
-    const formData = new FormData();
-    formData.append('status', newStatus);
-    
-    fetch(`/projects/{{ project.id }}/tasks/${taskId}/update_status`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateTaskStatusUI(taskId, newStatus);
-            updateProgressBar(data.progress_percentage, data.task_stats);
-            showNotification(data.message, 'success');
-        } else {
-            showNotification(data.message || 'Erreur lors de la mise à jour', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Erreur de connexion', 'error');
-    });
-}
 
-// Update UI after status change
 function updateTaskStatusUI(taskId, newStatus) {
     const statusCell = document.getElementById(`status-${taskId}`);
+    if (!statusCell) return;
+    
     let badgeClass, statusText;
     
     switch(newStatus) {
@@ -1311,207 +1276,308 @@ function updateTaskStatusUI(taskId, newStatus) {
             badgeClass = 'badge bg-success';
             statusText = 'Terminée';
             break;
+        default:
+            badgeClass = 'badge bg-secondary';
+            statusText = newStatus;
     }
     
     statusCell.innerHTML = `<span class="${badgeClass}">${statusText}</span>`;
 }
 
-// Add this JavaScript to your details.html template
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Task status update functionality
-    const statusSelects = document.querySelectorAll('.status-select');
-    
-    statusSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            updateTaskStatus(this);
-        });
-    });
-});
-
-function updateTaskStatus(selectElement) {
-    const taskId = selectElement.dataset.taskId;
-    const projectId = selectElement.dataset.projectId;
-    const newStatus = selectElement.value;
-    const taskItem = selectElement.closest('.task-item');
-    const oldValue = selectElement.defaultValue;
-    
-    // Store the old value before making the request
-    selectElement.defaultValue = selectElement.value;
-    
-    // Add loading state
-    taskItem.classList.add('loading');
-    selectElement.disabled = true;
-    
-    // Create form data
-    const formData = new FormData();
-    formData.append('status', newStatus);
-    
-    // Make AJAX request
-    fetch(`/projects/${projectId}/tasks/${taskId}/update_status`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update task visual elements
-            updateTaskVisual(taskItem, newStatus);
-            
-            // Update statistics if provided
-            if (data.task_stats) {
-                updateTaskStatistics(data.task_stats);
-            }
-            
-            // Show success message
-            showAlert('success', data.message);
-            
-            // Update timestamp
-            updateTaskTimestamp(taskItem);
-            
-        } else {
-            // Revert select to previous value
-            selectElement.value = data.old_status || oldValue;
-            selectElement.defaultValue = data.old_status || oldValue;
-            showAlert('danger', data.message || 'Erreur lors de la mise à jour');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'Erreur de connexion. Veuillez réessayer.');
-        // Revert select to previous value
-        selectElement.value = oldValue;
-        selectElement.defaultValue = oldValue;
-    })
-    .finally(() => {
-        // Remove loading state
-        taskItem.classList.remove('loading');
-        selectElement.disabled = false;
-    });
-}
-
-function updateTaskVisual(taskItem, newStatus) {
-    const statusDot = taskItem.querySelector('.task-status');
-    const statusBadge = taskItem.querySelector('.task-status-badge');
-    
-    // Update status dot
-    statusDot.className = 'task-status';
-    
-    // Update status badge
-    statusBadge.className = 'badge task-status-badge';
-    
-    switch(newStatus) {
-        case 'todo':
-            statusDot.classList.add('status-à-faire');
-            statusBadge.classList.add('bg-warning', 'text-dark');
-            statusBadge.textContent = 'À faire';
-            break;
-        case 'in_progress':
-            statusDot.classList.add('status-en-cours');
-            statusBadge.classList.add('bg-info', 'text-white');
-            statusBadge.textContent = 'En cours';
-            break;
-        case 'completed':
-            statusDot.classList.add('status-terminé');
-            statusBadge.classList.add('bg-success');
-            statusBadge.textContent = 'Terminée';
-            break;
+function updateProgressBar(progressPercentage, taskStats) {
+    // Update progress bar if it exists
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        progressBar.style.width = progressPercentage + '%';
+        progressBar.setAttribute('aria-valuenow', progressPercentage);
+        progressBar.textContent = Math.round(progressPercentage) + '%';
     }
-}
-
-function updateTaskStatistics(taskStats) {
-    // Update the statistics counters
-    const todoElement = document.getElementById('todoCount') || document.querySelector('[data-stat="todo"]');
-    const inProgressElement = document.getElementById('inProgressCount') || document.querySelector('[data-stat="in_progress"]');
-    const completedElement = document.getElementById('completedCount') || document.querySelector('[data-stat="completed"]');
     
-    if (todoElement) todoElement.textContent = taskStats.todo;
-    if (inProgressElement) inProgressElement.textContent = taskStats.in_progress;
-    if (completedElement) completedElement.textContent = taskStats.completed;
-}
-
-function updateTaskTimestamp(taskItem) {
-    const timestampElement = taskItem.querySelector('.text-secondary:last-child');
-    if (timestampElement) {
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
+    // Update task statistics
+    if (taskStats) {
+        const todoElement = document.getElementById('todoCount') || document.querySelector('[data-stat="todo"]');
+        const inProgressElement = document.getElementById('inProgressCount') || document.querySelector('[data-stat="in_progress"]');
+        const completedElement = document.getElementById('completedCount') || document.querySelector('[data-stat="completed"]');
         
-        timestampElement.textContent = `MAJ : ${day}/${month} à ${hours}:${minutes}`;
+        if (todoElement) todoElement.textContent = taskStats.todo;
+        if (inProgressElement) inProgressElement.textContent = taskStats.in_progress;
+        if (completedElement) completedElement.textContent = taskStats.completed;
     }
 }
 
-function showAlert(type, message) {
-    // Check if we have a flash message container
-    let alertContainer = document.getElementById('alertContainer') || 
-                        document.querySelector('.alert-container') ||
-                        document.querySelector('main .container');
+// =============================================================================
+// NOTIFICATION SYSTEM
+// =============================================================================
+
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification-alert');
+    existingNotifications.forEach(notification => notification.remove());
     
-    if (!alertContainer) {
-        // Create alert container if it doesn't exist
-        alertContainer = document.createElement('div');
-        alertContainer.id = 'alertContainer';
-        const mainContent = document.querySelector('main') || document.body;
-        mainContent.insertBefore(alertContainer, mainContent.firstChild);
-    }
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show notification-alert`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
     
-    const alertId = 'alert-' + Date.now();
-    
-    const alert = document.createElement('div');
-    alert.id = alertId;
-    alert.className = `alert alert-${type} alert-dismissible fade show`;
-    alert.innerHTML = `
+    notification.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
-    alertContainer.appendChild(alert);
+    document.body.appendChild(notification);
     
     // Auto-dismiss after 5 seconds
     setTimeout(() => {
-        const alertElement = document.getElementById(alertId);
-        if (alertElement) {
-            alertElement.remove();
+        if (notification.parentNode) {
+            notification.remove();
         }
     }, 5000);
 }
 
-// Add CSS for loading state if not already present
-if (!document.querySelector('#taskStatusCSS')) {
-    const style = document.createElement('style');
-    style.id = 'taskStatusCSS';
-    style.textContent = `
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-            position: relative;
-        }
+// =============================================================================
+// NAVIGATION MENU (HAMBURGER)
+// =============================================================================
+
+function initializeNavigation() {
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    
+    if (!hamburger || !navMenu) return;
+    
+    hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
         
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        if (navMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
         }
+    });
+
+    // Close menu when clicking nav links
+    const navLinks = document.querySelectorAll('.admin-nav a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    });
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Close menu on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+}
+function initializeTextareaResize() {
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        // Set initial height
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        // Add input event listener
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+}
+function initializeTaskStatusSelects() {
+    const statusSelects = document.querySelectorAll('.status-select');
+    
+    statusSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const taskId = this.dataset.taskId;
+            const newStatus = this.value;
+            
+            if (taskId && newStatus) {
+                updateTaskStatus(taskId, newStatus);
+            }
+        });
+    });
+}
+
+// =============================================================================
+// DROPDOWN CLICK HANDLERS
+// =============================================================================
+
+function initializeDropdownHandlers() {
+    document.addEventListener('click', function(e) {
+        // Handle status option clicks
+        if (e.target.closest('.status-option')) {
+            e.preventDefault();
+            const option = e.target.closest('.status-option');
+            const dropdown = option.closest('.status-dropdown');
+            
+            if (dropdown) {
+                const taskId = dropdown.dataset.taskId;
+                const newStatus = option.dataset.status;
+                
+                if (taskId && newStatus) {
+                    updateTaskStatus(taskId, newStatus);
+                }
+            }
         }
-    `;
-    document.head.appendChild(style);
-}</script>
+    });
+}
+
+// =============================================================================
+// BULK ACTIONS (if needed)
+// =============================================================================
+
+function initializeBulkActions() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+            taskCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+}
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing...');
+    
+    // Initialize all components
+    initializeNavigation();
+    initializeTextareaResize();
+    initializeTaskStatusSelects();
+    initializeDropdownHandlers();
+    initializeBulkActions();
+    
+    // Set project ID if available
+    const projectIdElement = document.querySelector('[data-project-id]');
+    if (projectIdElement) {
+        window.projectId = projectIdElement.getAttribute('data-project-id');
+        console.log('Project ID set:', window.projectId);
+    }
+    
+    console.log('All components initialized successfully');
+});
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+// Function to safely get element by ID
+function safeGetElementById(id) {
+    const element = document.getElementById(id);
+    if (!element) {
+        console.warn(`Element with ID '${id}' not found`);
+    }
+    return element;
+}
+
+// Function to safely query selector
+function safeQuerySelector(selector) {
+    const element = document.querySelector(selector);
+    if (!element) {
+        console.warn(`Element with selector '${selector}' not found`);
+    }
+    return element;
+}
+
+// Debug function to check if all required elements exist
+function debugCheckElements() {
+    console.log('=== DEBUGGING ELEMENTS ===');
+    
+    // Check comment elements
+    const comments = document.querySelectorAll('.comment-item');
+    console.log(`Found ${comments.length} comment items`);
+    
+    comments.forEach((comment, index) => {
+        const commentId = comment.querySelector('[onclick*="editComment"]')?.getAttribute('onclick')?.match(/\d+/)?.[0];
+        if (commentId) {
+            const contentEl = document.getElementById(`comment-content-${commentId}`);
+            const formEl = document.getElementById(`edit-form-${commentId}`);
+            console.log(`Comment ${commentId}: content=${!!contentEl}, form=${!!formEl}`);
+        }
+    });
+    
+    // Check task elements
+    const tasks = document.querySelectorAll('.task-item');
+    console.log(`Found ${tasks.length} task items`);
+    
+    console.log('=== END DEBUG ===');
+}
+
+// Add CSS for loading states and notifications
+const style = document.createElement('style');
+style.textContent = `
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+        position: relative;
+    }
+    
+    .loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 10;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .notification-alert {
+        animation: slideInRight 0.3s ease-out;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`;
+
+document.head.appendChild(style);
+
+window.debugCheckElements = debugCheckElements;
+</script>
 </body>
 </html>

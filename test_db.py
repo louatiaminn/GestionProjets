@@ -1,14 +1,12 @@
 from app import create_app
-from models import db, User, Project, Task, UserRole, TaskStatus  # Import from models package
+from models import db, User, Project, Task, UserRole, TaskStatus  
 from werkzeug.security import generate_password_hash
 
 app = create_app('development')
 
 with app.app_context():
-    # Create tables
     db.create_all()
     
-    # Create a test user
     test_user = User(
         username='admin',
         email='admin@example.com',
